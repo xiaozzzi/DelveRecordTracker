@@ -3,6 +3,7 @@
 ## Notes: Save Delve Records
 ## Author: xzzz
 ## Version: v11.1
+## IconTexTure: Interface\AddOns\DelveRecordTracker\assets\Icon.tga
 ## DefaultState: enabled
 ## SavedVariables: DRT_DB,DRT_CONFIG_DB
 ## X-Category: Delve
@@ -14,7 +15,6 @@ libs/Ace3/AceAddon-3.0/AceAddon-3.0.lua
 libs/Ace3/AceDB-3.0/AceDB-3.0.lua
 libs/Ace3/AceGUI-3.0/AceGUI-3.0.xml
 
-DRT_RecordModify.lua
 DRT_Core.lua
 DRT_Functions.lua
 DRT_Test.lua
