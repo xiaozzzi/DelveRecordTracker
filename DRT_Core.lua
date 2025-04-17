@@ -40,6 +40,21 @@ local function SimpleConfirm(message, callback)
   end
 end
 
+local isDbug = false
+
+---输出日志, 通过 /drt debug 开启, 通过 /drt nodebug 关闭
+---@param msg string 日志
+---@param level string 级别 ERROR|DEBUG, 默认为DEBUG
+local function debug(msg, level)
+  if isDbug then
+    if (level == 'ERROR') then
+      print(format('DRT |cFFD20103[%s]: %s|r', level, msg))
+    else
+      print(format('DRT: %s', msg))
+    end
+  end
+end
+
 --#region 地下堡记录
 
 -------------------------------------------------------------------------------------------------------------
@@ -47,7 +62,7 @@ end
 -------------------------------------------------------------------------------------------------------------
 ---绘制地下堡记录
 local function DrawDelveRecord(container)
-  print('DRT: 绘制记录页面')
+  debug('绘制记录页面 => DrawDelveRecord')
   GuiCreateEmptyLine(container, 2)                     --创建空行
 
   local scrollcontainer = AceGUI:Create("SimpleGroup") -- "InlineGroup" is also good
@@ -122,7 +137,7 @@ end
 -- 设置
 -------------------------------------------------------------------------------------------------------------
 local function resetRecord()
-  print('DRT: 周长重置, 地下堡记录清空')
+  debug('周长重置, 地下堡记录清空 => resetRecord')
   for i = 1, #(DRT_DB) do
     local player = DRT_DB[i]
     player.record = {}
@@ -131,7 +146,7 @@ local function resetRecord()
 end
 
 local function resetPlayer()
-  print('DRT: 周长重置, 地下堡记录清空')
+  debug('周长重置, 地下堡记录清空 => resetPlayer')
   DRT_DB = {}
 end
 
@@ -167,32 +182,32 @@ local function DrawDelveSetting(container)
 
   GuiCreateSpacing(scroll, 500)
 
-  local resetBtn = AceGUI:Create("Button")
-  resetBtn:SetText("清空数据")
-  resetBtn:SetWidth(100)
-  resetBtn:SetCallback("OnClick", function()
-    SimpleConfirm("是否清空用户数据", function()
-      resetPlayer()
+  if isDbug then
+    local resetBtn = AceGUI:Create("Button")
+    resetBtn:SetText("清空数据")
+    resetBtn:SetWidth(100)
+    resetBtn:SetCallback("OnClick", function()
+      SimpleConfirm("是否清空用户数据", function()
+        resetPlayer()
+      end)
     end)
-  end)
-  scroll:AddChild(resetBtn)
+    scroll:AddChild(resetBtn)
 
-  GuiCreateSpacing(scroll, 20)
+    GuiCreateSpacing(scroll, 20)
 
-  local initTestBtn = AceGUI:Create("Button")
-  initTestBtn:SetText("测试数据")
-  initTestBtn:SetWidth(100)
-  initTestBtn:SetCallback("OnClick", function()
-    SimpleConfirm("是否创建测试数据, 原数据将被删除", function()
-      InitTestData()
+    local initTestBtn = AceGUI:Create("Button")
+    initTestBtn:SetText("测试数据")
+    initTestBtn:SetWidth(100)
+    initTestBtn:SetCallback("OnClick", function()
+      SimpleConfirm("是否创建测试数据, 原数据将被删除", function()
+        InitTestData()
+      end)
     end)
-  end)
-  scroll:AddChild(initTestBtn)
+    scroll:AddChild(initTestBtn)
+  end
 
   GuiCreateEmptyLine(scroll, 2)
-
   GuiCreateChatLabel(scroll, format('最近一次选择的地下堡层数: %s', DRT_CONFIG_DB['LAST_SELECTED_DELVES_TIER']), 280, "LEFT")
-
   GuiCreateEmptyLine(scroll, 10)
 
   --------------------------------------------------
@@ -225,7 +240,7 @@ local function DrawDelveSetting(container)
     showDropdown:SetValue(player.show)
     showDropdown:SetWidth(130)
     showDropdown:SetCallback("OnValueChanged", function(a, b, key)
-      print("修改了:", player.unitName, key)
+      debug("修改了角色显示开关:", player.unitName, key)
       local index = chekcPlayerDBIndex(player.unitName, player.realm)
       player = DRT_DB[index]
       player.show = key
@@ -239,7 +254,7 @@ local function DrawDelveSetting(container)
     sortText:SetText(player.sort)
     sortText:SetWidth(100)
     sortText:SetCallback("OnEnterPressed", function(a, b, sort)
-      print("修改了:", player.unitName, sort)
+      debug("修改了角色排序:", player.unitName, sort)
       local index = chekcPlayerDBIndex(player.unitName, player.realm)
       player = DRT_DB[index]
       player.sort = sort
@@ -282,7 +297,7 @@ local function showUI()
     DRTMainFrame:Show()
     DRTTabFrame:SelectTab("record")
   else
-    print('DRT: 初始化页面')
+    debug('插件初始化页面 => DRTMainFrame is nil and showUI')
     -- 创建主页面
     DRTMainFrame = AceGUI:Create("Frame")
     DRTMainFrame:EnableResize(false) -- 不允许改变窗口大小
@@ -331,6 +346,7 @@ local function delveCompleteHandle(delveZone)
 
   if delveTier == nil or tonumber(delveTier) < 1 or tonumber(delveTier) > 11 then
     delveTier = "未获取层数"
+    debug("未获取到地下堡层数", "ERROR")
   end
 
   local unitName, realm = UnitFullName("player")
@@ -339,7 +355,7 @@ local function delveCompleteHandle(delveZone)
   local index = chekcPlayerDBIndex(unitName, realm)
   -- 用户不存在, 新增用户信息及本次地下堡记录
   if index == 0 then
-    print(format('DRT: 地下堡 [%s-%s] 已完成, 新增用户 %s-%s', delveZone, delveTier, unitName, realm))
+    debug(format('地下堡 [%s-%s] 已完成, 新增用户 %s-%s', delveZone, delveTier, unitName, realm))
     table.insert(
       DRT_DB,
       {
@@ -353,7 +369,7 @@ local function delveCompleteHandle(delveZone)
       }
     )
   else
-    print(format('DRT: %s-%s 已完成 [%s-%s]', unitName, realm, delveZone, delveTier))
+    debug(format('%s-%s 已完成 [%s-%s]', unitName, realm, delveZone, delveTier))
     -- 用户存在, 新增本次地下堡记录
     local player = DRT_DB[index]
     local record = player["record"]
@@ -387,7 +403,7 @@ DRTFrame:SetScript("OnEvent", function(self, event, unit, ...)
       DRT_CONFIG_DB = {}
     end
     DRT_CONFIG_DB['LAST_SELECTED_DELVES_TIER'] = C_CVar.GetCVar('lastSelectedDelvesTier')
-    print(format('DRT: Wellcome Delve Record Tracker, %s [%s]', UnitName("player"), UnitGUID("player")))
+    debug(format('Wellcome Delve Record Tracker, %s [%s]', UnitName("player"), UnitGUID("player")))
   elseif event == "SCENARIO_UPDATE" then
     -- =========================================================== --
     -- 当进入一个 Delve 时，加载 SCENARIO 更新事件来监听一个完成的 Delve  --
@@ -410,7 +426,12 @@ end)
 
 -- 命令开启
 SLASH_DRT1 = "/drt"
-SlashCmdList["DRT"] = function(msg, editBox)
+SlashCmdList["DRT"] = function(arg1)
+  if arg1 == "nodebug" then
+    isDbug = false
+  elseif arg1 == "debug" then
+    isDbug = true
+  end
   if not isFrameVisible then
     showUI()
     isFrameVisible = true
