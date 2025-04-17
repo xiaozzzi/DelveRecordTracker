@@ -1,5 +1,5 @@
 --- 创建测试数据
-function initTestData()
+function InitTestData()
   print('DT: 初始化地下堡测试数据')
   DRT_DB = {}
   local tb1 = {}
