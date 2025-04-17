@@ -1,0 +1,20 @@
+## Interface: 110002
+## Title: DelveRecordTracker
+## Notes: Save Delve Records
+## Author: xzzz
+## Version: v11.1
+## DefaultState: enabled
+## SavedVariables: DRT_DB,DRT_CONFIG_DB
+## X-Category: Delve
+## Category-zhCN: 地下堡
+
+# Libraries
+libs/Ace3/LibStub/LibStub.lua
+libs/Ace3/AceAddon-3.0/AceAddon-3.0.lua
+libs/Ace3/AceDB-3.0/AceDB-3.0.lua
+libs/Ace3/AceGUI-3.0/AceGUI-3.0.xml
+
+DRT_RecordModify.lua
+DRT_Core.lua
+DRT_Functions.lua
+DRT_Test.lua
