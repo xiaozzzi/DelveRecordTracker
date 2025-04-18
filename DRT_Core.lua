@@ -78,25 +78,11 @@ local function checkBountyMap(unitGUID)
 
   modifyDB(unitGUID, "bountyMapStatus", bountyMapStatus)
 
-  print(format("DRT: 已完成藏宝图: %s, 藏宝图数: %s", tostring(completedDelveBountyMap), C_Item.GetItemCount(233071, true, false)))
+  -- DRT_Log:debug(format("DRT: 已完成藏宝图: %s, 藏宝图数: %s", tostring(completedDelveBountyMap), C_Item.GetItemCount(233071, true, false)))
 
   return bountyMapStatus
 end
 
-local isDebug = false
-
----输出日志, 通过 /drt debug 开启, 通过 /drt nodebug 关闭
----@param msg string 日志
----@param level string 级别 ERROR|DEBUG, 默认为DEBUG
-local function debug(msg, level)
-  if isDebug then
-    if (level == 'ERROR') then
-      print(format('DRT |cFFD20103[%s]: %s|r', level, msg))
-    else
-      print(format('DRT: %s', msg))
-    end
-  end
-end
 --#region 地下堡记录
 
 -------------------------------------------------------------------------------------------------------------
@@ -104,7 +90,7 @@ end
 -------------------------------------------------------------------------------------------------------------
 ---绘制地下堡记录
 local function DrawDelveRecord(container)
-  debug('绘制记录页面 => DrawDelveRecord')
+  DRT_Log:debug('绘制记录页面 => DrawDelveRecord')
   GuiCreateEmptyLine(container, 2)                     --创建空行
 
   local scrollcontainer = AceGUI:Create("SimpleGroup") -- "InlineGroup" is also good
@@ -147,7 +133,7 @@ local function DrawDelveRecord(container)
         bountyMapText = " |cFF7DDA58[已使用 |TInterface\\Icons\\Icon_treasuremap:0|t]|r\n"
       end
 
-      if isDebug then
+      if DRT_Log.isDebug then
         playerText = playerText .. bountyMapText .. player.unitGUID .. ""
       else
         playerText = playerText .. bountyMapText
@@ -188,13 +174,197 @@ end
 
 --#endregion
 
+--#region 手动添加地下堡记录
+
+---地下堡列表
+---cmd: /dump C_Map.GetMapInfo(2252) 获取地图名称
+---cmd: /dump C_Map.GetMapChildrenInfo(2255) 获取子地图名称
+---cmd: /dump C_Map.GetBestMapForUnit("player") 获取当前用户所在地图名称
+local Delves = {
+  -- 2274 卡加阿兹
+  -- 2248 多恩岛
+  2249, -- 真菌之愚
+  2250, -- 克莱格瓦之眠
+  2269, -- 地匍矿洞
+  -- 2214 喧鸣深窟
+  2251, -- 水能堡
+  2302, -- 恐惧陷坑
+  2396, -- 九号挖掘场
+  -- 2215 陨圣峪
+  2277, -- 夜幕圣所
+  2301, -- 无底沉穴
+  2310, -- 飞掠裂口
+  2312, -- 丝菌师洞穴
+  -- 2255 艾基
+  2299, -- 幽暗要塞
+  2314, -- 塔克-雷桑深渊
+  2347, -- 螺旋织纹
+  --2346 安德麦
+  2423, -- 闸板陋巷
+}
+
+local Tiers = {
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+}
+
+local function addRecord(container)
+  local settingContainer = AceGUI:Create("SimpleGroup") -- "InlineGroup" is also good
+  settingContainer:SetFullWidth(true)                   -- 最大宽度
+  settingContainer:SetFullHeight(true)                  -- 最大高度
+  settingContainer:SetLayout("Fill")                    -- important!
+  container:AddChild(settingContainer)
+
+  -- 提前定义记录列表
+  local innerGroup = AceGUI:Create("InlineGroup")
+  innerGroup:SetFullWidth(true)
+  innerGroup:SetLayout("Flow")
+
+  local saveResult = AceGUI:Create("Label")
+  saveResult:SetFont(ChatFontNormal:GetFont())
+  saveResult:SetFullWidth(true)
+  saveResult:SetJustifyH("CENTER")
+
+  local scroll = AceGUI:Create("ScrollFrame")
+  scroll:SetLayout("Flow")
+  settingContainer:AddChild(scroll)
+
+  GuiCreateEmptyLine(scroll, 2)
+  GuiCreateChatLabel(scroll, "如遇到高达掉线等非正常退出情况, 可能无法正确保存地下堡记录, 可手动添加.", 800, "LEFT")
+  GuiCreateEmptyLine(scroll, 5)
+
+  GuiCreateChatLabel(scroll, "", 200, "LEFT")
+  GuiCreateChatLabel(scroll, "角色名称", 210, "LEFT")
+  GuiCreateChatLabel(scroll, "地下堡名称", 165, "LEFT")
+  GuiCreateChatLabel(scroll, "层数", 170, "LEFT")
+
+  GuiCreateEmptyLine(scroll, 2)
+
+  GuiCreateChatLabel(scroll, "选择角色: ", 100, "LEFT")
+
+  local playerList = {}
+
+  for key, player in pairs(DRT_DB) do
+    playerList[player.unitGUID] = format("|c%s%s-%s|r",
+      C_ClassColor.GetClassColor(player.classFilename):GenerateHexColor(),
+      player.unitName, player.realm)
+  end
+
+  local function DrawDelveRecordInnerGroup(unitGUID)
+    if innerGroup then
+      innerGroup:ReleaseChildren()
+    end
+    local index = chekcPlayerDBIndex(unitGUID)
+    for i, record in pairs(DRT_DB[index].record) do
+      if tonumber(record.tier) == 11 then
+        GuiCreateChatLabel(innerGroup, format("|cFFFFD100%s - %s|r", record.tier, record.zone), 200, "LEFT")
+      elseif tonumber(record.tier) < 8 then
+        GuiCreateChatLabel(innerGroup, format("|cFF8B8989%s - %s|r", record.tier, record.zone), 200, "LEFT")
+      else
+        GuiCreateChatLabel(innerGroup, format("%s - %s", record.tier, record.zone), 200, "LEFT")
+      end
+      -- 删除某条记录
+      local delBtn = AceGUI:Create("Button")
+      delBtn:SetText("删除")
+      delBtn:SetWidth(70)
+      delBtn:SetCallback("OnClick", function()
+        local player = DRT_DB[index]
+        table.remove(player.record, i)
+        delBtn:SetDisabled(true)
+        DrawDelveRecordInnerGroup(unitGUID)
+        print('删除记录: ' .. tostring(i))
+      end)
+      innerGroup:AddChild(delBtn)
+      if i % 1 == 0 then
+        GuiCreateSpacing(innerGroup, 200)
+      elseif i % 2 == 1 then
+        GuiCreateEmptyLine(innerGroup, 2)
+      end
+    end
+  end
+
+  local selectPlayer = {}
+
+  local playerDropdown = AceGUI:Create("Dropdown")
+  playerDropdown:SetList(playerList)
+  playerDropdown:SetWidth(240)
+  playerDropdown:SetCallback("OnValueChanged", function(a, b, unitGUID)
+    DRT_Log:debug(format("选择了角色: %s ", unitGUID, unitGUID))
+    selectPlayer.unitGUID = unitGUID
+    DrawDelveRecordInnerGroup(unitGUID)
+  end)
+  scroll:AddChild(playerDropdown)
+
+  GuiCreateSpacing(scroll, 20)
+
+  local delveList = {}
+  for _, mapId in pairs(Delves) do
+    local delve = C_Map.GetMapInfo(mapId)
+    if delve ~= nil then
+      delveList[delve.name] = delve.name
+    end
+  end
+
+  local delveDropdown = AceGUI:Create("Dropdown")
+  delveDropdown:SetList(delveList)
+  delveDropdown:SetWidth(170)
+  delveDropdown:SetCallback("OnValueChanged", function(a, b, zone)
+    DRT_Log:debug(format("选择了地下堡: %s ", zone))
+    selectPlayer.zone = zone
+  end)
+  scroll:AddChild(delveDropdown)
+
+  GuiCreateSpacing(scroll, 20)
+
+  local tierDropdown = AceGUI:Create("Dropdown")
+  tierDropdown:SetList(Tiers)
+  tierDropdown:SetWidth(80)
+  tierDropdown:SetCallback("OnValueChanged", function(a, b, tier)
+    DRT_Log:debug(format("选择了层数: %s ", tier))
+    selectPlayer.tier = tier
+  end)
+  scroll:AddChild(tierDropdown)
+
+  GuiCreateSpacing(scroll, 20)
+
+  local saveButton = AceGUI:Create("Button")
+  saveButton:SetText("保存")
+  saveButton:SetWidth(100)
+  saveButton:SetCallback("OnClick", function()
+    if selectPlayer.unitGUID == nil or selectPlayer.zone == nil or selectPlayer.tier == nil or
+        #(selectPlayer.unitGUID) == 0 or #(selectPlayer.zone) == 0
+    then
+      saveResult:SetText("|cFFE4080A请先选择角色与地下堡信息|r")
+    else
+      local index = chekcPlayerDBIndex(selectPlayer.unitGUID)
+      table.insert(DRT_DB[index].record, { zone = selectPlayer.zone, tier = selectPlayer.tier })
+      DrawDelveRecordInnerGroup(selectPlayer.unitGUID)
+      saveResult:SetText("|cFF7DDA58保存成功!|r")
+    end
+  end)
+  scroll:AddChild(saveButton)
+
+  GuiCreateEmptyLine(scroll, 2)
+
+  scroll:AddChildren(saveResult)
+
+  GuiCreateEmptyLine(scroll, 5)
+  ---------------------------------------------------------
+  local settingHead = AceGUI:Create("Heading")
+  settingHead:SetText("记录列表")
+  settingHead:SetFullWidth(true)
+  scroll:AddChild(settingHead)
+  scroll:AddChild(innerGroup)
+end
+
+--#endregion
+
 --#region 设置页面
 
 -------------------------------------------------------------------------------------------------------------
 -- 设置
 -------------------------------------------------------------------------------------------------------------
 local function resetRecord()
-  debug('周长重置, 地下堡记录清空 => resetRecord')
+  DRT_Log:debug('周长重置, 地下堡记录清空 => resetRecord')
   for i = 1, #(DRT_DB) do
     local player = DRT_DB[i]
     player.bountyMapStatus = "NOT_OBTAINED"
@@ -240,7 +410,7 @@ local function DrawDelveSetting(container)
 
   GuiCreateSpacing(scroll, 500)
 
-  if isDebug then
+  if DRT_Log.isDebug then
     local resetBtn = AceGUI:Create("Button")
     resetBtn:SetText("清空数据")
     resetBtn:SetWidth(100)
@@ -298,7 +468,7 @@ local function DrawDelveSetting(container)
     showDropdown:SetValue(player.show)
     showDropdown:SetWidth(130)
     showDropdown:SetCallback("OnValueChanged", function(a, b, key)
-      debug(format("修改了角色显示开关: %s => %s ", player.unitName, key))
+      DRT_Log:debug(format("修改了角色显示开关: %s => %s ", player.unitName, key))
       modifyDB(player.unitGUID, "show", key)
     end)
     scroll:AddChild(showDropdown)
@@ -309,7 +479,7 @@ local function DrawDelveSetting(container)
     sortText:SetText(player.sort)
     sortText:SetWidth(100)
     sortText:SetCallback("OnEnterPressed", function(a, b, sort)
-      debug(format("修改了排序：%s => %s ", player.unitName, sort))
+      DRT_Log:debug(format("修改了排序：%s => %s ", player.unitName, sort))
       modifyDB(player.unitGUID, "sort", sort)
     end)
     scroll:AddChild(sortText)
@@ -340,6 +510,8 @@ local function showUI()
     container:ReleaseChildren()
     if group == "record" then
       DrawDelveRecord(container)
+    elseif group == "addRecord" then
+      addRecord(container)
     elseif group == "setting" then
       DrawDelveSetting(container)
     end
@@ -349,7 +521,7 @@ local function showUI()
     DRTMainFrame:Show()
     DRTTabFrame:SelectTab("record")
   else
-    debug('插件初始化页面 => DRTMainFrame is nil and showUI')
+    DRT_Log:debug('插件初始化页面 => DRTMainFrame is nil and showUI')
     -- 创建主页面
     DRTMainFrame = AceGUI:Create("Frame")
     DRTMainFrame:EnableResize(false) -- 不允许改变窗口大小
@@ -364,7 +536,7 @@ local function showUI()
 
     DRTTabFrame = AceGUI:Create("TabGroup")
     DRTTabFrame:SetLayout("Flow")
-    DRTTabFrame:SetTabs({ { text = "完成记录", value = "record" }, { text = "设置", value = "setting" } })
+    DRTTabFrame:SetTabs({ { text = "完成记录", value = "record" }, { text = "添加记录", value = "addRecord" }, { text = "设置", value = "setting" } })
     DRTTabFrame:SetCallback("OnGroupSelected", SelectGroup)
     DRTTabFrame:SelectTab("record")
 
@@ -378,8 +550,9 @@ end
 
 local DRTFrame = CreateFrame("Frame", "DRTFrame", UIParent, "DialogBoxFrame")
 DRTFrame:RegisterEvent("ADDON_LOADED")
-DRTFrame:RegisterEvent("SCENARIO_UPDATE")
 DRTFrame:RegisterEvent("BAG_UPDATE_DELAYED")
+DRTFrame:RegisterEvent("SCENARIO_UPDATE")          -- 场景战役状态发生变更时触发
+DRTFrame:RegisterEvent("SCENARIO_CRITERIA_UPDATE") -- 场景战役目标更新时触发, 例如拾取了物品, 击杀了怪物等
 DRTFrame:SetSize(0, 0)
 DRTFrame:Hide()
 
@@ -416,7 +589,7 @@ local function delveCompleteHandle(delveZone)
 
   if delveTier == nil or tonumber(delveTier) < 1 or tonumber(delveTier) > 11 then
     delveTier = "未获取层数"
-    debug("未获取到地下堡层数", "ERROR")
+    DRT_Log:error("未获取到地下堡层数")
   end
 
   local unitName, realm = UnitFullName("player")
@@ -426,7 +599,7 @@ local function delveCompleteHandle(delveZone)
 
   -- 用户不存在, 新增用户信息及本次地下堡记录
   if index == 0 then
-    debug(format('地下堡 [%s-%s] 已完成, 新增用户 %s-%s', delveZone, delveTier, unitName, realm))
+    DRT_Log:debug(format('地下堡 [%s-%s] 已完成, 新增用户 %s-%s', delveZone, delveTier, unitName, realm))
     table.insert(
       DRT_DB,
       {
@@ -441,7 +614,7 @@ local function delveCompleteHandle(delveZone)
       }
     )
   else
-    debug(format('%s-%s 已完成 [%s-%s]', unitName, realm, delveZone, delveTier))
+    DRT_Log:debug(format('%s-%s 已完成 [%s-%s]', unitName, realm, delveZone, delveTier))
     -- 用户存在, 新增本次地下堡记录
     local player = DRT_DB[index]
     local record = player["record"]
@@ -474,7 +647,6 @@ DRTFrame:SetScript("OnEvent", function(self, event, unit, ...)
     end
     addonInitHandle()
   elseif event == "BAG_UPDATE_DELAYED" then
-    print("背包物品变更")
     checkBountyMap()
   elseif event == "SCENARIO_UPDATE" then
     -- =========================================================== --
@@ -482,6 +654,7 @@ DRTFrame:SetScript("OnEvent", function(self, event, unit, ...)
     -- =========================================================== --
     if C_PartyInfo.IsDelveInProgress() == true then
       self:RegisterEvent("SCENARIO_CRITERIA_UPDATE")
+      print('DRT: 触发 SCENARIO_UPDATE')
       DRT_CONFIG_DB['LAST_SELECTED_DELVES_TIER'] = C_CVar.GetCVar('lastSelectedDelvesTier')
     end
   elseif event == "SCENARIO_CRITERIA_UPDATE" then
@@ -489,7 +662,9 @@ DRTFrame:SetScript("OnEvent", function(self, event, unit, ...)
     -- =========================================================== --
     -- 监听 delve 完成并持久化 --
     -- =========================================================== --
+    print('DRT: 触发 SCENARIO_CRITERIA_UPDATE, 地下堡是否完成: ', C_PartyInfo.IsDelveComplete())
     if C_PartyInfo.IsDelveComplete() == true and delveZone ~= "Zekvir's Lair" and delveZone ~= "Underpin's Demolition Competition" then
+      -- 需要注销事件, 防止重复调用
       self:UnregisterEvent("SCENARIO_CRITERIA_UPDATE")
       delveCompleteHandle(delveZone)
     end
@@ -500,9 +675,9 @@ end)
 SLASH_DRT1 = "/drt"
 SlashCmdList["DRT"] = function(arg1)
   if arg1 == "nodebug" then
-    isDebug = false
+    DRT_Log.isDebug = false
   elseif arg1 == "debug" then
-    isDebug = true
+    DRT_Log.isDebug = true
   end
   if not isFrameVisible then
     showUI()
