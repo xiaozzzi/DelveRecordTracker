@@ -3,7 +3,9 @@ DRT_Log = {
 }
 
 function DRT_Log:debug(msg)
-  print(format('DRT: %s', msg))
+  if DRT_Log.isDebug then
+    print(format('DRT: %s', msg))
+  end
 end
 
 function DRT_Log:error(msg)

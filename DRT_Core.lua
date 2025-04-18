@@ -271,7 +271,6 @@ local function addRecord(container)
         table.remove(player.record, i)
         delBtn:SetDisabled(true)
         DrawDelveRecordInnerGroup(unitGUID)
-        print('删除记录: ' .. tostring(i))
       end)
       innerGroup:AddChild(delBtn)
       if i % 1 == 0 then
@@ -563,9 +562,9 @@ DRTFrame:Hide()
 local function addonInitHandle()
   local unitName = UnitFullName("player")
   local unitGUID = UnitGUID("player")
-  print("========================================")
-  print(format('DRT: Hello ~ %s [%s]', unitName, unitGUID))
-  print("========================================")
+  -- print("========================================")
+  -- print(format('DRT: Hello ~ %s [%s]', unitName, unitGUID))
+  -- print("========================================")
   -- 初始化表
   if DRT_CONFIG_DB == nil then
     DRT_CONFIG_DB = {}
@@ -654,7 +653,7 @@ DRTFrame:SetScript("OnEvent", function(self, event, unit, ...)
     -- =========================================================== --
     if C_PartyInfo.IsDelveInProgress() == true then
       self:RegisterEvent("SCENARIO_CRITERIA_UPDATE")
-      print('DRT: 触发 SCENARIO_UPDATE')
+      -- print('DRT: 触发 SCENARIO_UPDATE')
       DRT_CONFIG_DB['LAST_SELECTED_DELVES_TIER'] = C_CVar.GetCVar('lastSelectedDelvesTier')
     end
   elseif event == "SCENARIO_CRITERIA_UPDATE" then
@@ -662,7 +661,7 @@ DRTFrame:SetScript("OnEvent", function(self, event, unit, ...)
     -- =========================================================== --
     -- 监听 delve 完成并持久化 --
     -- =========================================================== --
-    print('DRT: 触发 SCENARIO_CRITERIA_UPDATE, 地下堡是否完成: ', C_PartyInfo.IsDelveComplete())
+    -- print('DRT: 触发 SCENARIO_CRITERIA_UPDATE, 地下堡是否完成: ', C_PartyInfo.IsDelveComplete())
     if C_PartyInfo.IsDelveComplete() == true and delveZone ~= "Zekvir's Lair" and delveZone ~= "Underpin's Demolition Competition" then
       -- 需要注销事件, 防止重复调用
       self:UnregisterEvent("SCENARIO_CRITERIA_UPDATE")
