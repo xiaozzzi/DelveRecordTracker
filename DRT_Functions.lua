@@ -61,3 +61,13 @@ function split(pString, pPattern)
   end
   return Table
 end
+
+---当前用户是否 获取or完成 本周丰裕藏宝图
+function IsCompletedDelveBountyMap()
+  return C_QuestLog.IsQuestFlaggedCompleted(86371)
+end
+
+---从背包和仓库中获取物品数量
+function GetItemCountFromAll(itemID)
+  return C_Item.GetItemCount(itemID, true, false)
+end
