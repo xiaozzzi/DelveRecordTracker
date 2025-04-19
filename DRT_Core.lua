@@ -256,11 +256,11 @@ local function addRecord(container)
     local index = chekcPlayerDBIndex(unitGUID)
     for i, record in pairs(DRT_DB[index].record) do
       if tonumber(record.tier) == 11 then
-        GuiCreateChatLabel(innerGroup, format("|cFFFFD100%s - %s|r", record.tier, record.zone), 200, "LEFT")
+        GuiCreateChatLabel(innerGroup, format("|cFFFFD100%s - %s|r", record.tier, record.zone), 170, "LEFT")
       elseif tonumber(record.tier) < 8 then
-        GuiCreateChatLabel(innerGroup, format("|cFF8B8989%s - %s|r", record.tier, record.zone), 200, "LEFT")
+        GuiCreateChatLabel(innerGroup, format("|cFF8B8989%s - %s|r", record.tier, record.zone), 170, "LEFT")
       else
-        GuiCreateChatLabel(innerGroup, format("%s - %s", record.tier, record.zone), 200, "LEFT")
+        GuiCreateChatLabel(innerGroup, format("%s - %s", record.tier, record.zone), 170, "LEFT")
       end
       -- 删除某条记录
       local delBtn = AceGUI:Create("Button")
@@ -274,7 +274,7 @@ local function addRecord(container)
       end)
       innerGroup:AddChild(delBtn)
       if i % 1 == 0 then
-        GuiCreateSpacing(innerGroup, 200)
+        GuiCreateSpacing(innerGroup, 120)
       elseif i % 2 == 1 then
         GuiCreateEmptyLine(innerGroup, 2)
       end
@@ -496,6 +496,27 @@ local function DrawDelveSetting(container)
     scroll:AddChild(deleteButton)
     GuiCreateEmptyLine(scroll, 1) --创建空行
   end
+
+
+  --------------------------------------------------
+  -- 页面设置
+  --------------------------------------------------
+  GuiCreateEmptyLine(scroll, 10)
+  local settingFrame = AceGUI:Create("Heading")
+  settingFrame:SetText("界面设置(重载界面后生效)")
+  settingFrame:SetFullWidth(true)
+  scroll:AddChild(settingFrame)
+
+  GuiCreateChatLabel(scroll, GetColorText("FFFFFF", "页面宽度: "), 100, "LEFT")
+
+  local mainWidthEdit = AceGUI:Create("EditBox")
+  mainWidthEdit:SetText(DRT_CONFIG_DB.mainWidth)
+  mainWidthEdit:SetWidth(100)
+  mainWidthEdit:SetCallback("OnEnterPressed", function(a, b, mainWidth)
+    DRT_CONFIG_DB.mainWidth = mainWidth
+  end)
+  scroll:AddChild(mainWidthEdit)
+  GuiCreateEmptyLine(scroll, 10)
 end
 --#endregion
 
@@ -529,7 +550,7 @@ local function showUI()
     DRTMainFrame:SetCallback("OnClose", function(widget)
       isFrameVisible = false
     end)
-    DRTMainFrame:SetWidth(1070)
+    DRTMainFrame:SetWidth(DRT_CONFIG_DB.mainWidth)
     DRTMainFrame:SetHeight(580)
     DRTMainFrame:SetLayout("Fill")
 
@@ -569,6 +590,11 @@ local function addonInitHandle()
   if DRT_CONFIG_DB == nil then
     DRT_CONFIG_DB = {}
   end
+
+  if (DRT_CONFIG_DB.mainWidth == nil) then
+    DRT_CONFIG_DB.mainWidth = 1070
+  end
+
   -- 初始化上次选择的地下堡层数
   DRT_CONFIG_DB['LAST_SELECTED_DELVES_TIER'] = C_CVar.GetCVar('lastSelectedDelvesTier')
   -- 初始化用户是否获取过本周丰裕地下堡藏宝图

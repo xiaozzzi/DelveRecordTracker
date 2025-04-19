@@ -1,6 +1,6 @@
 ---获取指定颜色的文本, 文本以 |cFF 开头, |r 结尾
 ---@param color string 颜色
----@param text number 行数
+---@param text string 内容
 ---@return string 文本
 function GetColorText(color, text)
   return "\124cff" .. color .. text .. "\124r"
