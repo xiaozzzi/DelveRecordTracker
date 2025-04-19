@@ -373,7 +373,7 @@ local function resetRecord()
 end
 
 local function resetPlayer()
-  debug('周长重置, 地下堡记录清空 => resetPlayer')
+  DRT_Log:debug('周长重置, 地下堡记录清空 => resetPlayer')
   DRT_DB = {}
 end
 
