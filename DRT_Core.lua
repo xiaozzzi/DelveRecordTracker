@@ -586,7 +586,11 @@ local function addonInitHandle()
   -- print("========================================")
   -- print(format('DRT: Hello ~ %s [%s]', unitName, unitGUID))
   -- print("========================================")
-  -- 初始化表
+  -- 初始化数据表
+  if DRT_DB == nil then
+    DRT_DB = {}
+  end
+  -- 初始化配置表
   if DRT_CONFIG_DB == nil then
     DRT_CONFIG_DB = {}
   end
