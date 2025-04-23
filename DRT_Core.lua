@@ -106,8 +106,11 @@ local function DrawDelveRecord(container)
   table.sort(DRT_DB, function(a, b) return tonumber(a.sort) < tonumber(b.sort) end)
   local unitGUID = UnitGUID("player")
 
+  local thisWeekCount = 0
+
   for i = 1, #(DRT_DB) do
     local player = DRT_DB[i]
+    thisWeekCount = thisWeekCount + #(player.record)
 
     if player.show ~= nil and player.show == 'SHOW' then
       -- player metadata
@@ -170,6 +173,11 @@ local function DrawDelveRecord(container)
       scroll:AddChild(label)
     end
   end
+
+  DRTMainFrame:SetStatusText(format('本周完成总数: %s   可用丰裕: %s',
+    GetColorText("FFFFFF", thisWeekCount),
+    GetColorText("FFFFFF", GetBountifulDelves())
+  ))
 end
 
 --#endregion
@@ -246,7 +254,7 @@ local function addRecord(container)
   for key, player in pairs(DRT_DB) do
     playerList[player.unitGUID] = format("|c%s%s-%s|r",
       C_ClassColor.GetClassColor(player.classFilename):GenerateHexColor(),
-      player.unitName, player.realm)
+      player.unitName, player.realm)x
   end
 
   local function DrawDelveRecordInnerGroup(unitGUID)
@@ -273,7 +281,6 @@ local function addRecord(container)
         DrawDelveRecordInnerGroup(unitGUID)
       end)
       innerGroup:AddChild(delBtn)
-      print(i .. ' / ' .. tostring(i % 1) .. ' / ' .. tostring(i % 2))
       if i % 2 == 1 then
         GuiCreateSpacing(innerGroup, 60)
       elseif i % 2 == 0 then
@@ -546,8 +553,8 @@ local function showUI()
     -- 创建主页面
     DRTMainFrame = AceGUI:Create("Frame")
     DRTMainFrame:EnableResize(false) -- 不允许改变窗口大小
-    DRTMainFrame:SetTitle("地下堡记录")
-    DRTMainFrame:SetStatusText("Delve Record Tracker - v11.1")
+    DRTMainFrame:SetTitle("地下堡记录" .. DRT_GLOBLE.VERSION)
+    -- DRTMainFrame:SetStatusText(DRT_GLOBLE.STATUS_TEXT .. DRT_GLOBLE.VERSION)
     DRTMainFrame:SetCallback("OnClose", function(widget)
       isMainFrameVisible = false
     end)
