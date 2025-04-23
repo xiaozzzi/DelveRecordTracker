@@ -500,7 +500,6 @@ local function showUI()
     DRTMainFrame = AceGUI:Create("Frame")
     DRTMainFrame:EnableResize(false) -- 不允许改变窗口大小
     DRTMainFrame:SetTitle("地下堡记录 " .. DRT_GLOBLE.VERSION)
-    -- DRTMainFrame:SetStatusText(DRT_GLOBLE.STATUS_TEXT .. DRT_GLOBLE.VERSION)
     DRTMainFrame:SetCallback("OnClose", function(widget)
       isMainFrameVisible = false
     end)

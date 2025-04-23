@@ -1,9 +1,10 @@
 ## Interface: 110002
 ## Title: DelveRecordTracker
-## Notes: Save Delve Records
+## Notes: Save the completion records of multiple players delve and display them uniformly.
+## Notes-zhCN: 保存多个角色的地下堡完成记录, 并统一展示.
 ## Author: xzzz
 ## Version: v11.2
-## IconTexTure: Interface\AddOns\DelveRecordTracker\assets\Icon.tga
+## IconTexTure: Interface\AddOns\DelveRecordTracker\assets\Logo
 ## DefaultState: enabled
 ## SavedVariables: DRT_DB,DRT_CONFIG_DB,DRT_ICON_DB
 ## X-Category: Delve
