@@ -1,5 +1,5 @@
 AceGUI = LibStub("AceGUI-3.0")
-local isFrameVisible = false
+local isMainFrameVisible = false
 local DRTMainFrame -- 主页面
 local DRTTabFrame  -- tab 页面
 
@@ -548,7 +548,7 @@ local function showUI()
     DRTMainFrame:SetTitle("地下堡记录")
     DRTMainFrame:SetStatusText("Delve Record Tracker - v11.1")
     DRTMainFrame:SetCallback("OnClose", function(widget)
-      isFrameVisible = false
+      isMainFrameVisible = false
     end)
     DRTMainFrame:SetWidth(DRT_CONFIG_DB.mainWidth)
     DRTMainFrame:SetHeight(580)
@@ -566,6 +566,11 @@ local function showUI()
     _G["DRTGlobalFrame"] = DRTMainFrame.frame
     tinsert(UISpecialFrames, "DRTGlobalFrame")
   end
+end
+
+local function hideUI()
+  DRTMainFrame:Hide()
+  isMainFrameVisible = false
 end
 
 local DRTFrame = CreateFrame("Frame", "DRTFrame", UIParent, "DialogBoxFrame")
@@ -708,8 +713,10 @@ SlashCmdList["DRT"] = function(arg1)
   elseif arg1 == "debug" then
     DRT_Log.isDebug = true
   end
-  if not isFrameVisible then
+  if not isMainFrameVisible then
     showUI()
-    isFrameVisible = true
+    isMainFrameVisible = true
+  else
+    hideUI()
   end
 end
