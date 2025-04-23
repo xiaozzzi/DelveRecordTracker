@@ -2,7 +2,7 @@
 ## Title: DelveRecordTracker
 ## Notes: Save Delve Records
 ## Author: xzzz
-## Version: v11.1
+## Version: v11.2
 ## IconTexTure: Interface\AddOns\DelveRecordTracker\assets\Icon.tga
 ## DefaultState: enabled
 ## SavedVariables: DRT_DB,DRT_CONFIG_DB
