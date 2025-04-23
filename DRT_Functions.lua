@@ -62,6 +62,11 @@ function split(pString, pPattern)
   return Table
 end
 
+-------------------------------------------------------------------------------------------------------------
+-- Blizzard Lua Api
+-- [Documentation](https://warcraft.wiki.gg/wiki/Lua_functions)
+-------------------------------------------------------------------------------------------------------------
+
 ---当前用户是否 获取or完成 本周丰裕藏宝图
 function IsCompletedDelveBountyMap()
   return C_QuestLog.IsQuestFlaggedCompleted(86371)
@@ -70,4 +75,26 @@ end
 ---从背包和仓库中获取物品数量
 function GetItemCountFromAll(itemID)
   return C_Item.GetItemCount(itemID, true, false)
+end
+
+---定义确认对话框（只需定义一次）
+---@param message string 提示信息
+---@param callback function 回调函数
+function SimpleConfirm(message, callback)
+  local dialog = StaticPopup_Show("DRT_SIMPLE_CONFIRM")
+  if not dialog then
+    StaticPopupDialogs["DRT_SIMPLE_CONFIRM"] = {
+      text = message,
+      button1 = "确定",
+      button2 = "取消",
+      OnAccept = callback,
+      timeout = 0,
+      whileDead = true,
+      hideOnEscape = true,
+    }
+    dialog = StaticPopup_Show("DRT_SIMPLE_CONFIRM")
+  else
+    dialog.text:SetText(message)
+    dialog.data = callback
+  end
 end

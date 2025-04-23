@@ -1,3 +1,12 @@
+DRT_UTIL = DRT_UTIL or {}
+
+if not DRT_ICON_DB then
+  DRT_ICON_DB = {
+    minimapPos = 140,
+    hide = false,
+  }
+end
+
 AceGUI = LibStub("AceGUI-3.0")
 local isMainFrameVisible = false
 local DRTMainFrame -- 主页面
@@ -17,29 +26,6 @@ local function chekcPlayerDBIndex(unitGUID)
   return index
 end
 
----定义确认对话框（只需定义一次）
----@param message string 提示信息
----@param callback function 回调函数
-local function SimpleConfirm(message, callback)
-  local dialog = StaticPopup_Show("DRT_SIMPLE_CONFIRM")
-  if not dialog then
-    StaticPopupDialogs["DRT_SIMPLE_CONFIRM"] = {
-      text = message,
-      button1 = "确定",
-      button2 = "取消",
-      OnAccept = callback,
-      timeout = 0,
-      whileDead = true,
-      hideOnEscape = true,
-    }
-    dialog = StaticPopup_Show("DRT_SIMPLE_CONFIRM")
-  else
-    dialog.text:SetText(message)
-    dialog.data = callback
-  end
-end
-
-
 --- 修改DB中某个值
 ---@param unitGUID any 角色ID
 ---@param key string 剑
@@ -55,7 +41,6 @@ local function modifyDB(unitGUID, key, value)
   DRT_DB[index] = player
   return true
 end
-
 
 ---检查用户的藏宝图数量
 ---@return string "NOT_OBTAINED/BAG/USED"
@@ -184,37 +169,8 @@ end
 
 --#region 手动添加地下堡记录
 
----地下堡列表
----cmd: /dump C_Map.GetMapInfo(2252) 获取地图名称
----cmd: /dump C_Map.GetMapChildrenInfo(2255) 获取子地图名称
----cmd: /dump C_Map.GetBestMapForUnit("player") 获取当前用户所在地图名称
-local Delves = {
-  -- 2274 卡加阿兹
-  -- 2248 多恩岛
-  2249, -- 真菌之愚
-  2250, -- 克莱格瓦之眠
-  2269, -- 地匍矿洞
-  -- 2214 喧鸣深窟
-  2251, -- 水能堡
-  2302, -- 恐惧陷坑
-  2396, -- 九号挖掘场
-  -- 2215 陨圣峪
-  2277, -- 夜幕圣所
-  2301, -- 无底沉穴
-  2310, -- 飞掠裂口
-  2312, -- 丝菌师洞穴
-  -- 2255 艾基
-  2299, -- 幽暗要塞
-  2314, -- 塔克-雷桑深渊
-  2347, -- 螺旋织纹
-  --2346 安德麦
-  2423, -- 闸板陋巷
-}
-
-local Tiers = {
-  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
-}
-
+--- add record
+---@param container any parent container
 local function addRecord(container)
   local settingContainer = AceGUI:Create("SimpleGroup") -- "InlineGroup" is also good
   settingContainer:SetFullWidth(true)                   -- 最大宽度
@@ -304,7 +260,7 @@ local function addRecord(container)
   GuiCreateSpacing(scroll, 20)
 
   local delveList = {}
-  for _, mapId in pairs(Delves) do
+  for _, mapId in pairs(DRT_DELVES_ID) do
     local delve = C_Map.GetMapInfo(mapId)
     if delve ~= nil then
       delveList[delve.name] = delve.name
@@ -323,7 +279,7 @@ local function addRecord(container)
   GuiCreateSpacing(scroll, 20)
 
   local tierDropdown = AceGUI:Create("Dropdown")
-  tierDropdown:SetList(Tiers)
+  tierDropdown:SetList(DRT_DELVE_TIERS)
   tierDropdown:SetWidth(80)
   tierDropdown:SetCallback("OnValueChanged", function(a, b, tier)
     DRT_Log:debug(format("选择了层数: %s ", tier))
@@ -429,16 +385,6 @@ local function DrawDelveSetting(container)
     scroll:AddChild(resetBtn)
 
     GuiCreateSpacing(scroll, 20)
-
-    local initTestBtn = AceGUI:Create("Button")
-    initTestBtn:SetText("测试数据")
-    initTestBtn:SetWidth(100)
-    initTestBtn:SetCallback("OnClick", function()
-      SimpleConfirm("是否创建测试数据, 原数据将被删除", function()
-        InitTestData()
-      end)
-    end)
-    scroll:AddChild(initTestBtn)
   end
 
   GuiCreateEmptyLine(scroll, 2)
@@ -576,9 +522,19 @@ local function showUI()
   end
 end
 
-local function hideUI()
-  DRTMainFrame:Hide()
-  isMainFrameVisible = false
+--- show and hide DRTMainFrame
+function TriggerFrame()
+  if not isMainFrameVisible then
+    showUI()
+    isMainFrameVisible = true
+  else
+    DRTMainFrame:Hide()
+    isMainFrameVisible = false
+  end
+end
+
+function DRT_UTIL:ToggleMainFrame()
+  TriggerFrame()
 end
 
 local DRTFrame = CreateFrame("Frame", "DRTFrame", UIParent, "DialogBoxFrame")
@@ -617,7 +573,6 @@ local function addonInitHandle()
   -- 初始化用户是否获取过本周丰裕地下堡藏宝图
   checkBountyMap(unitGUID)
 end
-
 
 ---地下堡完成时保存数据
 ---@param delveZone string 地下堡名称
@@ -721,10 +676,5 @@ SlashCmdList["DRT"] = function(arg1)
   elseif arg1 == "debug" then
     DRT_Log.isDebug = true
   end
-  if not isMainFrameVisible then
-    showUI()
-    isMainFrameVisible = true
-  else
-    hideUI()
-  end
+  TriggerFrame()
 end

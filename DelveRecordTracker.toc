@@ -5,7 +5,7 @@
 ## Version: v11.2
 ## IconTexTure: Interface\AddOns\DelveRecordTracker\assets\Icon.tga
 ## DefaultState: enabled
-## SavedVariables: DRT_DB,DRT_CONFIG_DB
+## SavedVariables: DRT_DB,DRT_CONFIG_DB,DRT_ICON_DB
 ## X-Category: Delve
 ## Category-zhCN: 地下堡
 
@@ -20,3 +20,4 @@ DRT_Bountiful.lua
 DRT_Log.lua
 DRT_Core.lua
 DRT_Functions.lua
+DRT_MinimapIcon.lua
