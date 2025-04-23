@@ -254,7 +254,7 @@ local function addRecord(container)
   for key, player in pairs(DRT_DB) do
     playerList[player.unitGUID] = format("|c%s%s-%s|r",
       C_ClassColor.GetClassColor(player.classFilename):GenerateHexColor(),
-      player.unitName, player.realm)x
+      player.unitName, player.realm)
   end
 
   local function DrawDelveRecordInnerGroup(unitGUID)
@@ -553,7 +553,7 @@ local function showUI()
     -- 创建主页面
     DRTMainFrame = AceGUI:Create("Frame")
     DRTMainFrame:EnableResize(false) -- 不允许改变窗口大小
-    DRTMainFrame:SetTitle("地下堡记录" .. DRT_GLOBLE.VERSION)
+    DRTMainFrame:SetTitle("地下堡记录 " .. DRT_GLOBLE.VERSION)
     -- DRTMainFrame:SetStatusText(DRT_GLOBLE.STATUS_TEXT .. DRT_GLOBLE.VERSION)
     DRTMainFrame:SetCallback("OnClose", function(widget)
       isMainFrameVisible = false
