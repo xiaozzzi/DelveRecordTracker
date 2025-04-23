@@ -273,10 +273,11 @@ local function addRecord(container)
         DrawDelveRecordInnerGroup(unitGUID)
       end)
       innerGroup:AddChild(delBtn)
-      if i % 1 == 0 then
-        GuiCreateSpacing(innerGroup, 120)
-      elseif i % 2 == 1 then
-        GuiCreateEmptyLine(innerGroup, 2)
+      print(i .. ' / ' .. tostring(i % 1) .. ' / ' .. tostring(i % 2))
+      if i % 2 == 1 then
+        GuiCreateSpacing(innerGroup, 60)
+      elseif i % 2 == 0 then
+        GuiCreateEmptyLine(innerGroup, 1)
       end
     end
   end
@@ -601,7 +602,7 @@ local function addonInitHandle()
   end
 
   if (DRT_CONFIG_DB.mainWidth == nil) then
-    DRT_CONFIG_DB.mainWidth = 1070
+    DRT_CONFIG_DB.mainWidth = 1080
   end
 
   -- 初始化上次选择的地下堡层数
