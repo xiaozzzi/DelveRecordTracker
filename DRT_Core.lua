@@ -15,7 +15,7 @@ local DRTTabFrame  -- tab 页面
 ---检查用户在DB中的下标，如果用户不存在，返回0
 ---@param unitGUID stringView 用户ID
 ---@return integer index 用户所在的下标
-local function chekcPlayerDBIndex(unitGUID)
+local function checkPlayerDBIndex(unitGUID)
   local index = 0
   for i, player in pairs(DRT_DB) do
     if player ~= nil and player.unitGUID == unitGUID then
@@ -32,7 +32,7 @@ end
 ---@param value any 值
 ---@return boolean 是-修改成功/否-修改失败
 local function modifyDB(unitGUID, key, value)
-  local index = chekcPlayerDBIndex(unitGUID)
+  local index = checkPlayerDBIndex(unitGUID)
   if index == 0 then
     return false
   end
@@ -50,9 +50,11 @@ local function checkBountyMap(unitGUID)
   end
 
   local bountyMapStatus = "NOT_OBTAINED"
+  -- 检查是否完拾取了本周的地下堡丰裕宝图
   local completedDelveBountyMap = IsCompletedDelveBountyMap()
 
   if completedDelveBountyMap then
+    -- 检查丰裕宝图是否在背包或仓库中
     local bountyMapCount = GetItemCountFromAll(233071)
     if bountyMapCount > 0 then
       bountyMapStatus = "BAG"
@@ -217,7 +219,7 @@ local function addRecord(container)
     if innerGroup then
       innerGroup:ReleaseChildren()
     end
-    local index = chekcPlayerDBIndex(unitGUID)
+    local index = checkPlayerDBIndex(unitGUID)
     for i, record in pairs(DRT_DB[index].record) do
       if tonumber(record.tier) == 11 then
         GuiCreateChatLabel(innerGroup, format("|cFFFFD100%s - %s|r", record.tier, record.zone), 170, "LEFT")
@@ -298,7 +300,7 @@ local function addRecord(container)
     then
       saveResult:SetText("|cFFE4080A请先选择角色与地下堡信息|r")
     else
-      local index = chekcPlayerDBIndex(selectPlayer.unitGUID)
+      local index = checkPlayerDBIndex(selectPlayer.unitGUID)
       table.insert(DRT_DB[index].record, { zone = selectPlayer.zone, tier = selectPlayer.tier })
       DrawDelveRecordInnerGroup(selectPlayer.unitGUID)
       saveResult:SetText("|cFF7DDA58保存成功!|r")
@@ -406,14 +408,16 @@ local function DrawDelveSetting(container)
   GuiCreateChatLabel(scroll, GetColorText("FFFFFF", "删除角色"), 120, "CENTER")
   GuiCreateEmptyLine(scroll, 2)
 
+  -- 角色列表
   for i = 1, #(DRT_DB) do
     local player = DRT_DB[i]
 
-    GuiCreateChatLabel(scroll, format("|c%s%s - %s|r\n\n",
+    local name = GuiCreateChatLabel(scroll, format("|c%s%s - %s|r\n\n",
       C_ClassColor.GetClassColor(player.classFilename):GenerateHexColor(),
       player.unitName,
       player.realm
     ), 250, "LEFT")
+    name:SetHeight(10)
 
     -- 显示下拉列表
     local showDropdown = AceGUI:Create("Dropdown")
@@ -443,11 +447,12 @@ local function DrawDelveSetting(container)
     deleteButton:SetText("删除")
     deleteButton:SetWidth(100)
     deleteButton:SetCallback("OnClick", function()
-      local index = chekcPlayerDBIndex(player.unitGUID)
+      local index = checkPlayerDBIndex(player.unitGUID)
       table.remove(DRT_DB, index)
       deleteButton:SetDisabled(true)
     end)
     scroll:AddChild(deleteButton)
+
     GuiCreateEmptyLine(scroll, 1) --创建空行
   end
 
@@ -591,7 +596,7 @@ local function delveCompleteHandle(delveZone)
   local unitName, realm = UnitFullName("player")
   local unitGUID = UnitGUID("player")
   local className, classFilename, classId = UnitClass("player")
-  local index = chekcPlayerDBIndex(unitGUID)
+  local index = checkPlayerDBIndex(unitGUID)
 
   -- 用户不存在, 新增用户信息及本次地下堡记录
   if index == 0 then

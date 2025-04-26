@@ -32,6 +32,7 @@ function GuiCreateChatLabel(container, text, width, justifyH)
     label:SetJustifyH(justifyH)
   end
   container:AddChild(label)
+  return label
 end
 
 ---在容器中创建间隔

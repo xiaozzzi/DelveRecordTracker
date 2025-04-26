@@ -2,4 +2,4 @@
 
 World of Warcraft Addon。
 
-It is used to record the delve records of multiple players and display them uniformly。
+Save the completion records of multiple players delve and display them uniformly.
