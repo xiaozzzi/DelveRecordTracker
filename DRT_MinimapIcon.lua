@@ -1,7 +1,6 @@
 local addon = LibStub("AceAddon-3.0"):NewAddon("DelveRecordTracker")
 DRT_MinimapButton = LibStub("LibDBIcon-1.0", true)
 
-
 local DRT_LDB = LibStub("LibDataBroker-1.1"):NewDataObject("DelveRecordTracker", {
   type = "data source",
   text = "DelveRecordTracker",
@@ -23,8 +22,6 @@ local DRT_LDB = LibStub("LibDataBroker-1.1"):NewDataObject("DelveRecordTracker",
   end,
 })
 
-local icon = LibStub("LibDBIcon-1.0")
-
 function addon:OnInitialize()
   self.db = LibStub("AceDB-3.0"):New("DRT_LDB", {
     profile = {
@@ -34,7 +31,7 @@ function addon:OnInitialize()
     },
   })
 
-  icon:Register("DelveRecordTracker", DRT_LDB, DRT_ICON_DB)
+  DRT_MinimapButton:Register("DelveRecordTracker", DRT_LDB, DRT_ICON_DB)
 end
 
 AddonCompartmentFrame:RegisterAddon({

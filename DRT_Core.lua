@@ -391,7 +391,7 @@ local function DrawDelveSetting(container)
 
   GuiCreateEmptyLine(scroll, 2)
   GuiCreateChatLabel(scroll, format('最近一次选择的地下堡层数: %s', DRT_CONFIG_DB['LAST_SELECTED_DELVES_TIER']), 280, "LEFT")
-  GuiCreateEmptyLine(scroll, 10)
+  GuiCreateEmptyLine(scroll, 5)
 
   --------------------------------------------------
   -- 角色列表
