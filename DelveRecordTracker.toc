@@ -12,9 +12,12 @@
 
 # Libraries
 libs/Ace3/LibStub/LibStub.lua
+libs/Ace3/AceLocale-3.0/AceLocale-3.0.lua
 libs/Ace3/AceAddon-3.0/AceAddon-3.0.lua
 libs/Ace3/AceDB-3.0/AceDB-3.0.lua
 libs/Ace3/AceGUI-3.0/AceGUI-3.0.xml
+
+locales\locales.xml
 
 DRT_Contants.lua
 DRT_Bountiful.lua

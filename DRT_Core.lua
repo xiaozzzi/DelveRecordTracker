@@ -1,3 +1,6 @@
+local _, ns = ...
+local L = ns.L or ns.LD
+
 DRT_UTIL = DRT_UTIL or {}
 
 if not DRT_ICON_DB then
@@ -118,9 +121,9 @@ local function DrawDelveRecord(container)
         -- bountyMapText = " |cFF8B8989[未拾取 |TInterface\\Icons\\Icon_treasuremap:0|t]|r\n"
         bountyMapText = "\n"
       elseif bountyMapStatus == "BAG" then
-        bountyMapText = " |cFFFFD100[背包中 |TInterface\\Icons\\Icon_treasuremap:0|t]|r\n"
+        bountyMapText = " |cFFFFD100[" .. L["BOUNTY_MAP_IN_BAG"] .. " |TInterface\\Icons\\Icon_treasuremap:0|t]|r\n"
       elseif bountyMapStatus == "USED" then
-        bountyMapText = " |cFF7DDA58[已使用 |TInterface\\Icons\\Icon_treasuremap:0|t]|r\n"
+        bountyMapText = " |cFF7DDA58[" .. L["BOUNTY_MAP_USED"] .. " |TInterface\\Icons\\Icon_treasuremap:0|t]|r\n"
       end
 
       if DRT_Log.isDebug then
@@ -161,7 +164,7 @@ local function DrawDelveRecord(container)
     end
   end
 
-  DRTMainFrame:SetStatusText(format('本周完成总数: %s   可用丰裕: %s',
+  DRTMainFrame:SetStatusText(format(L["COMPLETE_THE_TOTAL"] .. ": %s   " .. L["BOUNTIFUL"] .. ": %s",
     GetColorText("FFFFFF", thisWeekCount),
     GetColorText("FFFFFF", GetBountifulDelves())
   ))
@@ -194,18 +197,16 @@ local function addRecord(container)
   scroll:SetLayout("Flow")
   settingContainer:AddChild(scroll)
 
-  GuiCreateEmptyLine(scroll, 2)
-  GuiCreateChatLabel(scroll, "如遇到高达掉线等非正常退出情况, 可能无法正确保存地下堡记录, 可手动添加.", 800, "LEFT")
   GuiCreateEmptyLine(scroll, 5)
 
   GuiCreateChatLabel(scroll, "", 200, "LEFT")
-  GuiCreateChatLabel(scroll, "角色名称", 210, "LEFT")
-  GuiCreateChatLabel(scroll, "地下堡名称", 165, "LEFT")
-  GuiCreateChatLabel(scroll, "层数", 170, "LEFT")
+  GuiCreateChatLabel(scroll, L["AR_PLAYER_NAME"], 210, "LEFT")
+  GuiCreateChatLabel(scroll, L["AR_DELVE_NAME"], 165, "LEFT")
+  GuiCreateChatLabel(scroll, L["AR_DELVE_TIER"], 170, "LEFT")
 
   GuiCreateEmptyLine(scroll, 2)
 
-  GuiCreateChatLabel(scroll, "选择角色: ", 100, "LEFT")
+  GuiCreateChatLabel(scroll, L["AR_SELECT_PLAYER"], 100, "LEFT")
 
   local playerList = {}
 
@@ -230,7 +231,7 @@ local function addRecord(container)
       end
       -- 删除某条记录
       local delBtn = AceGUI:Create("Button")
-      delBtn:SetText("删除")
+      delBtn:SetText(L["DELETE"])
       delBtn:SetWidth(70)
       delBtn:SetCallback("OnClick", function()
         local player = DRT_DB[index]
@@ -292,18 +293,18 @@ local function addRecord(container)
   GuiCreateSpacing(scroll, 20)
 
   local saveButton = AceGUI:Create("Button")
-  saveButton:SetText("保存")
+  saveButton:SetText(L["SAVE"])
   saveButton:SetWidth(100)
   saveButton:SetCallback("OnClick", function()
     if selectPlayer.unitGUID == nil or selectPlayer.zone == nil or selectPlayer.tier == nil or
         #(selectPlayer.unitGUID) == 0 or #(selectPlayer.zone) == 0
     then
-      saveResult:SetText("|cFFE4080A请先选择角色与地下堡信息|r")
+      saveResult:SetText(L["SELECT_PLAYER_AND_DELVE_FIRST"])
     else
       local index = checkPlayerDBIndex(selectPlayer.unitGUID)
       table.insert(DRT_DB[index].record, { zone = selectPlayer.zone, tier = selectPlayer.tier })
       DrawDelveRecordInnerGroup(selectPlayer.unitGUID)
-      saveResult:SetText("|cFF7DDA58保存成功!|r")
+      saveResult:SetText(L["SAVE_SUCCESS"])
     end
   end)
   scroll:AddChild(saveButton)
@@ -315,7 +316,7 @@ local function addRecord(container)
   GuiCreateEmptyLine(scroll, 5)
   ---------------------------------------------------------
   local settingHead = AceGUI:Create("Heading")
-  settingHead:SetText("记录列表")
+  settingHead:SetText(L["AR_DELVE_RECORED"])
   settingHead:SetFullWidth(true)
   scroll:AddChild(settingHead)
   scroll:AddChild(innerGroup)
@@ -357,17 +358,17 @@ local function DrawDelveSetting(container)
   settingContainer:AddChild(scroll)
 
   local settingHead = AceGUI:Create("Heading")
-  settingHead:SetText("操作")
+  settingHead:SetText(L["OPERATION"])
   settingHead:SetFullWidth(true)
   scroll:AddChild(settingHead)
 
   GuiCreateEmptyLine(scroll, 2) --创建空行
 
   local resetBtn = AceGUI:Create("Button")
-  resetBtn:SetText("重置记录(每周更新后)")
+  resetBtn:SetText(L["RESET_RECORD"])
   resetBtn:SetWidth(200)
   resetBtn:SetCallback("OnClick", function()
-    SimpleConfirm("是否重置地下堡记录", function()
+    SimpleConfirm(L["RESET_RECORD_CONFIRM"], function()
       resetRecord()
     end)
   end)
@@ -390,22 +391,26 @@ local function DrawDelveSetting(container)
   end
 
   GuiCreateEmptyLine(scroll, 2)
-  GuiCreateChatLabel(scroll, format('最近一次选择的地下堡层数: %s', DRT_CONFIG_DB['LAST_SELECTED_DELVES_TIER']), 280, "LEFT")
+  GuiCreateChatLabel(scroll,
+    format('%s: %s', L["LAST_SELECTED_DELVES_TIER"], DRT_CONFIG_DB['LAST_SELECTED_DELVES_TIER']),
+    280,
+    "LEFT"
+  )
   GuiCreateEmptyLine(scroll, 5)
 
   --------------------------------------------------
   -- 角色列表
   --------------------------------------------------
   local settingPlayer = AceGUI:Create("Heading")
-  settingPlayer:SetText("角色配置")
+  settingPlayer:SetText(L["PLAYER_STTING"])
   settingPlayer:SetFullWidth(true)
   scroll:AddChild(settingPlayer)
 
   GuiCreateEmptyLine(scroll, 2)
-  GuiCreateChatLabel(scroll, GetColorText("FFFFFF", "角色"), 280, "LEFT")
-  GuiCreateChatLabel(scroll, GetColorText("FFFFFF", "是否显示角色"), 140, "CENTER")
-  GuiCreateChatLabel(scroll, GetColorText("FFFFFF", "角色排序"), 120, "CENTER")
-  GuiCreateChatLabel(scroll, GetColorText("FFFFFF", "删除角色"), 120, "CENTER")
+  GuiCreateChatLabel(scroll, GetColorText("FFFFFF", L["PLAYER_NAME"]), 280, "LEFT")
+  GuiCreateChatLabel(scroll, GetColorText("FFFFFF", L["PLAYER_VISIBLE"]), 140, "CENTER")
+  GuiCreateChatLabel(scroll, GetColorText("FFFFFF", L["PLAYER_SORT"]), 120, "CENTER")
+  GuiCreateChatLabel(scroll, GetColorText("FFFFFF", L["PLAYER_DELETE"]), 120, "CENTER")
   GuiCreateEmptyLine(scroll, 2)
 
   -- 角色列表
@@ -421,7 +426,10 @@ local function DrawDelveSetting(container)
 
     -- 显示下拉列表
     local showDropdown = AceGUI:Create("Dropdown")
-    showDropdown:SetList({ ['SHOW'] = "|cFF7DDA58显示|r", ['HIDE'] = "|cFFE4080A不显示|r" })
+    showDropdown:SetList({
+      ['SHOW'] = L["VISIBLE"],
+      ['HIDE'] = L["IN_VISIBLE"],
+    })
     showDropdown:SetValue(player.show)
     showDropdown:SetWidth(130)
     showDropdown:SetCallback("OnValueChanged", function(a, b, key)
@@ -444,7 +452,7 @@ local function DrawDelveSetting(container)
 
     -- 删除按钮
     local deleteButton = AceGUI:Create("Button")
-    deleteButton:SetText("删除")
+    deleteButton:SetText(L["DELETE"])
     deleteButton:SetWidth(100)
     deleteButton:SetCallback("OnClick", function()
       local index = checkPlayerDBIndex(player.unitGUID)
@@ -462,11 +470,11 @@ local function DrawDelveSetting(container)
   --------------------------------------------------
   GuiCreateEmptyLine(scroll, 10)
   local settingFrame = AceGUI:Create("Heading")
-  settingFrame:SetText("界面设置(重载界面后生效)")
+  settingFrame:SetText(L["FRAME_SETTING"])
   settingFrame:SetFullWidth(true)
   scroll:AddChild(settingFrame)
 
-  GuiCreateChatLabel(scroll, GetColorText("FFFFFF", "页面宽度: "), 100, "LEFT")
+  GuiCreateChatLabel(scroll, GetColorText("FFFFFF", L["FRAME_WIDTH"]), 100, "LEFT")
 
   local mainWidthEdit = AceGUI:Create("EditBox")
   mainWidthEdit:SetText(DRT_CONFIG_DB.mainWidth)
@@ -504,7 +512,7 @@ local function showUI()
     -- 创建主页面
     DRTMainFrame = AceGUI:Create("Frame")
     DRTMainFrame:EnableResize(false) -- 不允许改变窗口大小
-    DRTMainFrame:SetTitle("地下堡记录 " .. DRT_GLOBLE.VERSION)
+    DRTMainFrame:SetTitle(L["DRT_ADDON_NAME"] .. " " .. DRT_GLOBLE.VERSION)
     DRTMainFrame:SetCallback("OnClose", function(widget)
       isMainFrameVisible = false
     end)
@@ -514,7 +522,11 @@ local function showUI()
 
     DRTTabFrame = AceGUI:Create("TabGroup")
     DRTTabFrame:SetLayout("Flow")
-    DRTTabFrame:SetTabs({ { text = "完成记录", value = "record" }, { text = "添加记录", value = "addRecord" }, { text = "设置", value = "setting" } })
+    DRTTabFrame:SetTabs({
+      { text = L["DRT_RECORDS"],    value = "record" },
+      { text = L["DRT_ADD_RECORD"], value = "addRecord" },
+      { text = L["DRT_SETTING"],    value = "setting" },
+    })
     DRTTabFrame:SetCallback("OnGroupSelected", SelectGroup)
     DRTTabFrame:SelectTab("record")
 
