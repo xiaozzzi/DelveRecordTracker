@@ -1,6 +1,6 @@
 local _, ns = ...
 
-if (GetLocale() ~= "zhTW") then return end
+if (GetLocale() ~= "zhCN") then return end
 --
 -- common
 ns.L                                  = {}
