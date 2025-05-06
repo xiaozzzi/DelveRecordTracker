@@ -1,5 +1,5 @@
 DRT_GLOBLE = {
-  VERSION = "v11.2",
+  VERSION = "v11.3",
 }
 
 --- 地下堡 PIO id
