@@ -669,6 +669,7 @@ DRTFrame:SetScript("OnEvent", function(self, event, unit, ...)
       self:RegisterEvent("SCENARIO_CRITERIA_UPDATE")
       -- print('DRT: 触发 SCENARIO_UPDATE')
       DRT_CONFIG_DB['LAST_SELECTED_DELVES_TIER'] = C_CVar.GetCVar('lastSelectedDelvesTier')
+
     end
   elseif event == "SCENARIO_CRITERIA_UPDATE" then
     local delveZone = GetZoneText()
@@ -680,6 +681,7 @@ DRTFrame:SetScript("OnEvent", function(self, event, unit, ...)
       -- 需要注销事件, 防止重复调用
       self:UnregisterEvent("SCENARIO_CRITERIA_UPDATE")
       delveCompleteHandle(delveZone)
+
     end
   end
 end)

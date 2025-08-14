@@ -82,7 +82,7 @@ end
 ---@param message string 提示信息
 ---@param callback function 回调函数
 function SimpleConfirm(message, callback)
-  local dialog = StaticPopup_Show("DRT_SIMPLE_CONFIRM")
+  local dialog = nil --StaticPopup_Show("DRT_SIMPLE_CONFIRM")
   if not dialog then
     StaticPopupDialogs["DRT_SIMPLE_CONFIRM"] = {
       text = message,
@@ -98,4 +98,16 @@ function SimpleConfirm(message, callback)
     dialog.text:SetText(message)
     dialog.data = callback
   end
+end
+
+function SecondsToHMS(seconds)
+  -- 确保输入为整数
+  seconds = math.floor(tonumber(seconds) or 0)
+  -- 计算时分秒
+  local hours = math.floor(seconds / 3600)
+  local remainder = seconds % 3600
+  local minutes = math.floor(remainder / 60)
+  local seconds = remainder % 60
+  -- 格式化为两位数
+  return string.format("%02d:%02d", minutes, seconds)
 end
