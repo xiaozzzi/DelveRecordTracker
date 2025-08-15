@@ -58,7 +58,9 @@ local function checkBountyMap(unitGUID)
 
   if completedDelveBountyMap then
     -- 检查丰裕宝图是否在背包或仓库中
-    local bountyMapCount = GetItemCountFromAll(233071)
+    -- 11.1 233071
+    -- 11.2 248017
+    local bountyMapCount = GetItemCountFromAll(248017) --
     if bountyMapCount > 0 then
       bountyMapStatus = "BAG"
     elseif bountyMapCount == 0 then

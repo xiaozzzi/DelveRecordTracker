@@ -3,7 +3,9 @@ DRT_GLOBLE = {
 }
 
 --- 地下堡 PIO id, 查询当日的丰裕地下堡
+--- POI ID 查询: https://wago.tools/db2/areapoi?build=11.2.0.62493&locale=zhCN
 --- cmd: /dump C_AreaPoiInfo.GetAreaPOIInfo(2339, 7898) -- 获取地图信息
+--- cmd: /dump C_AreaPoiInfo.GetDelvesForMap(2371)      -- 获取地下堡ID
 DRT_DELVES_POI_IDS = {
     -- 多恩岛
     [7787] = { ["zone"] = 2248 }, -- 地铺矿洞
@@ -26,7 +28,7 @@ DRT_DELVES_POI_IDS = {
     -- 安德麦
     [8246] = { ["zone"] = 2346 }, -- 闸板陋巷
     -- 卡雷什
-    [8274] = { ["zone"] = 2371 }, -- 档案馆突袭
+    [8273] = { ["zone"] = 2371 }, -- 档案馆突袭
     [8323] = { ["zone"] = 2371 }, -- 虚空之锋庇护所
 
 }
