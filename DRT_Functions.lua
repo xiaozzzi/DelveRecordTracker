@@ -68,7 +68,7 @@ end
 -- [Documentation](https://warcraft.wiki.gg/wiki/Lua_functions)
 -------------------------------------------------------------------------------------------------------------
 
----当前用户是否 获取or完成 本周丰裕藏宝图
+---当前用户是否 [获取] or [完成] 本周丰裕藏宝图
 function IsCompletedDelveBountyMap()
   return C_QuestLog.IsQuestFlaggedCompleted(86371)
 end

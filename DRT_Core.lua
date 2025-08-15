@@ -53,14 +53,14 @@ local function checkBountyMap(unitGUID)
   end
 
   local bountyMapStatus = "NOT_OBTAINED"
-  -- 检查是否完拾取了本周的地下堡丰裕宝图
+  -- 检查是否拾取了本周的地下堡丰裕宝图
   local completedDelveBountyMap = IsCompletedDelveBountyMap()
 
   if completedDelveBountyMap then
     -- 检查丰裕宝图是否在背包或仓库中
-    -- 11.1 233071
-    -- 11.2 248017
-    local bountyMapCount = GetItemCountFromAll(248017) --
+    -- 11.1 233071 地下堡行者的奖赏(第二赛季)
+    -- 11.2 248142 地下堡行者的奖赏(第三赛季)
+    local bountyMapCount = GetItemCountFromAll(248142)
     if bountyMapCount > 0 then
       bountyMapStatus = "BAG"
     elseif bountyMapCount == 0 then
@@ -70,7 +70,8 @@ local function checkBountyMap(unitGUID)
 
   modifyDB(unitGUID, "bountyMapStatus", bountyMapStatus)
 
-  -- DRT_Log:debug(format("DRT: 已完成藏宝图: %s, 藏宝图数: %s", tostring(completedDelveBountyMap), C_Item.GetItemCount(233071, true, false)))
+  DRT_Log:debug(format("DRT: 已完成藏宝图: %s, 藏宝图数: %s", tostring(completedDelveBountyMap),
+    C_Item.GetItemCount(248142, true, false)))
 
   return bountyMapStatus
 end
@@ -123,9 +124,11 @@ local function DrawDelveRecord(container)
         -- bountyMapText = " |cFF8B8989[未拾取 |TInterface\\Icons\\Icon_treasuremap:0|t]|r\n"
         bountyMapText = "\n"
       elseif bountyMapStatus == "BAG" then
-        bountyMapText = " |cFFFFD100[" .. L["BOUNTY_MAP_IN_BAG"] .. " |TInterface\\Icons\\Icon_treasuremap:0|t]|r\n"
+        bountyMapText = " |cFFFFD100[" ..
+            L["BOUNTY_MAP_IN_BAG"] .. " |TInterface\\Icons\\Icon_treasuremap:0|t]|r\n"
       elseif bountyMapStatus == "USED" then
-        bountyMapText = " |cFF7DDA58[" .. L["BOUNTY_MAP_USED"] .. " |TInterface\\Icons\\Icon_treasuremap:0|t]|r\n"
+        bountyMapText = " |cFF7DDA58[" ..
+            L["BOUNTY_MAP_USED"] .. " |TInterface\\Icons\\Icon_treasuremap:0|t]|r\n"
       end
 
       if DRT_Log.isDebug then
@@ -671,7 +674,6 @@ DRTFrame:SetScript("OnEvent", function(self, event, unit, ...)
       self:RegisterEvent("SCENARIO_CRITERIA_UPDATE")
       -- print('DRT: 触发 SCENARIO_UPDATE')
       DRT_CONFIG_DB['LAST_SELECTED_DELVES_TIER'] = C_CVar.GetCVar('lastSelectedDelvesTier')
-
     end
   elseif event == "SCENARIO_CRITERIA_UPDATE" then
     local delveZone = GetZoneText()
@@ -683,7 +685,6 @@ DRTFrame:SetScript("OnEvent", function(self, event, unit, ...)
       -- 需要注销事件, 防止重复调用
       self:UnregisterEvent("SCENARIO_CRITERIA_UPDATE")
       delveCompleteHandle(delveZone)
-
     end
   end
 end)
