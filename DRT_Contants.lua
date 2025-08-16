@@ -1,5 +1,5 @@
 DRT_GLOBLE = {
-  VERSION = "v11.3",
+  VERSION = "v11.4",
 }
 
 --- 地下堡 PIO id, 查询当日的丰裕地下堡
