@@ -4,7 +4,7 @@
 ## Notes-zhCN: 保存多个角色的地下堡完成记录, 并统一展示.
 ## Notes-ruRU: Сохраняет записи завершённых Вылазок на нескольких персонажах и отображает их в одном окне.
 ## Author: xzzz
-## Version: v11.3
+## Version: v12.0.1
 ## IconTexTure: Interface\AddOns\DelveRecordTracker\assets\Logo
 ## DefaultState: enabled
 ## SavedVariables: DRT_DB,DRT_CONFIG_DB,DRT_ICON_DB
