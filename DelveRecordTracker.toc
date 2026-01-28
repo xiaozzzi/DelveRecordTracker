@@ -1,4 +1,4 @@
-## Interface: 110200, 110205
+## Interface: 120001, 120000
 ## Title: DelveRecordTracker
 ## Notes: Save the completion records of multiple players delve and display them uniformly.
 ## Notes-zhCN: 保存多个角色的地下堡完成记录, 并统一展示.
