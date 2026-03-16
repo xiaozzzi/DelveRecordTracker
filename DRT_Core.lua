@@ -77,6 +77,7 @@ local function checkBountyMap(unitGUID)
 end
 
 --#region 地下堡记录
+
 -------------------------------------------------------------------------------------------------------------
 -- 地下堡记录
 -------------------------------------------------------------------------------------------------------------
@@ -99,10 +100,9 @@ local function DrawDelveRecord(container)
     local unitGUID = UnitGUID("player")
     local thisWeekCount = 0
 
+    -- 遍历所有用户
     for i = 1, #(DRT_DB) do
         local player = DRT_DB[i]
-        print('player' .. player.unitName)
-
         thisWeekCount = thisWeekCount + #(player.record)
 
         if player.show ~= nil and player.show == 'SHOW' then
@@ -396,8 +396,10 @@ local function DrawDelveSetting(container)
     end
 
     GuiCreateEmptyLine(scroll, 2)
+    -- 最近一次选择的地下堡层数
     GuiCreateChatLabel(scroll,
-        format('%s: %s', L["LAST_SELECTED_DELVES_TIER"], DRT_CONFIG_DB['LAST_SELECTED_DELVES_TIER']),
+        format('%s: %s', "11", "22"),
+        -- format('%s: %s', L["LAST_SELECTED_DELVES_TIER"], DRT_CONFIG_DB['LAST_SELECTED_DELVES_TIER']),
         280,
         "LEFT"
     )
@@ -571,11 +573,8 @@ DRTFrame:Hide()
 -------------------------------------------------------------------------------------------------------------
 ---完成必要的数据初始化和查询
 local function addonInitHandle()
-    local unitName = UnitFullName("player")
+    -- local unitName = UnitFullName("player")
     local unitGUID = UnitGUID("player")
-    -- print("========================================")
-    -- print(format('DRT: Hello ~ %s [%s]', unitName, unitGUID))
-    -- print("========================================")
     -- 初始化数据表
     if DRT_DB == nil then
         DRT_DB = {}
@@ -666,10 +665,8 @@ DRTFrame:SetScript("OnEvent", function(self, event, unit, ...)
         -- if C_CVar.GetCVar('lastSelectedDelvesTier') > C_CVar.GetCVar('highestUnlockedDelvesTier') then
         --     C_CVar.SetCVar('lastSelectedDelvesTier', 11)
         -- end
-        print('上次地下堡1>' .. C_CVar.GetCVar('lastSelectedTieredEntranceTier'))
-        print('上次地下堡2>' .. C_CVar.GetCVar('highestUnlockedTieredEntranceTier'))
-        C_AreaPoiInfo.GetAreaPOIInfo(2339, 7898)
-        C_AreaPoiInfo.GetDelvesForMap(2371)
+        -- print('上次地下堡1>' .. C_CVar.GetCVar('lastSelectedTieredEntranceTier'))
+        -- print('上次地下堡2>' .. C_CVar.GetCVar('highestUnlockedTieredEntranceTier'))
         
         addonInitHandle()
         elseif event == "BAG_UPDATE_DELAYED" then
