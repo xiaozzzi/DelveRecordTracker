@@ -1,18 +1,19 @@
 ---获取今日丰裕地下堡
 function GetBountifulDelves()
-  local bountifulDelves = {}
-  for delvePoiID, delveConfig in pairs(DRT_DELVES_POI_IDS) do
-    -- uiMapID: 地下堡所在的地图, areaPoiID 地下堡的PIO id
-    local delve = C_AreaPoiInfo.GetAreaPOIInfo(delveConfig["zone"], delvePoiID)
+    local bountifulDelves = {}
+    for delvePoiID, delveConfig in pairs(DRT_DELVES_POI_IDS) do
+        local delveIds = C_AreaPoiInfo.GetDelvesForMap(delveConfig["zone"])
+        for _, delveID in ipairs(delveIds) do
+            local delveInfo = C_AreaPoiInfo.GetAreaPOIInfo(delveConfig["zone"], delveID)
+            print(delveInfo.name .. delveInfo.atlasName)
 
-    if delve ~= nil and delve["atlasName"] == "delves-bountiful" then
-      table.insert(bountifulDelves, delve["name"])
+            if delveInfo ~= nil and delveInfo.atlasName == "delves-bountiful" then
+                table.insert(bountifulDelves, delveInfo.name)
+            end
+        end
     end
-  end
-
-  return table.concat(bountifulDelves, ", ")
+    return table.concat(bountifulDelves, ", ")
 end
-
 
 --- 地下堡故事变种
 -- 1. /dump C_AreaPoiInfo.GetAreaPOIInfo(2371, 8273) 获取 tooltipWidgetSet

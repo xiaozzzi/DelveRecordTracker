@@ -60,7 +60,8 @@ local function checkBountyMap(unitGUID)
         -- 检查丰裕宝图是否在背包或仓库中
         -- 11.1 233071 地下堡行者的奖赏(第二赛季)
         -- 11.2 248142 地下堡行者的奖赏(第三赛季)
-        local bountyMapCount = GetItemCountFromAll(248142)
+        -- 12.0 252415 珍宝猎手的奖赏(第一赛季)
+        local bountyMapCount = GetItemCountFromAll(252415)
         if bountyMapCount > 0 then
             bountyMapStatus = "BAG"
         elseif bountyMapCount == 0 then
@@ -71,7 +72,7 @@ local function checkBountyMap(unitGUID)
     modifyDB(unitGUID, "bountyMapStatus", bountyMapStatus)
 
     DRT_Log:debug(format("DRT: 已完成藏宝图: %s, 藏宝图数: %s", tostring(completedDelveBountyMap),
-        C_Item.GetItemCount(248142, true, false)))
+        C_Item.GetItemCount(252415, true, false)))
 
     return bountyMapStatus
 end
@@ -137,6 +138,17 @@ local function DrawDelveRecord(container)
                 playerText = playerText .. bountyMapText
             end
 
+            -- 货币
+            local currencyText = ""
+            -- -- 钥匙
+            -- local keyInfo = C_CurrencyInfo.GetCurrencyInfo(3028)
+            -- currencyText = currencyText .. "|T4622270:14:14|t" .. keyInfo.quantity .. " "
+            -- -- 碎片
+            -- local keyFragmentInfo = C_CurrencyInfo.GetCurrencyInfo(3310)
+            -- currencyText = currencyText ..
+            --     "|T133016:14:14|t" .. keyFragmentInfo.quantityEarnedThisWeek .. "/" .. keyFragmentInfo.maxWeeklyQuantity
+            -- -- 低保
+
             -- records
             local recordText = ""
             table.sort(player.record, function(a, b) return tonumber(a.tier) > tonumber(b.tier) end)
@@ -160,19 +172,22 @@ local function DrawDelveRecord(container)
                 end
             end
 
-            local label = AceGUI:Create("Label")
-            label:SetText(playerText .. "\n" .. recordText)
-            label:SetFont(ChatFontNormal:GetFont())
-            label:SetWidth(200)
-            label:SetHeight(210);
-            scroll:AddChild(label)
+
+            local recordLabel = AceGUI:Create("Label")
+            recordLabel:SetText(playerText .. "\n" .. currencyText .. recordText)
+            recordLabel:SetFont(ChatFontNormal:GetFont())
+            recordLabel:SetWidth(200)
+            recordLabel:SetHeight(210);
+            scroll:AddChild(recordLabel)
         end
     end
 
-    DRTMainFrame:SetStatusText(format(L["COMPLETE_THE_TOTAL"] .. ": %s   " .. L["BOUNTIFUL"] .. ": %s",
-        GetColorText("FFFFFF", thisWeekCount),
-        GetColorText("FFFFFF", GetBountifulDelves())
-    ))
+    -- DRTMainFrame:SetStatusText(format(L["COMPLETE_THE_TOTAL"] .. ": %s   " .. L["BOUNTIFUL"] .. ": %s",
+    --     GetColorText("FFFFFF", thisWeekCount),
+    -- -- GetColorText("FFFFFF", GetBountifulDelves())
+    -- ))
+
+    DRTMainFrame:SetStatusText(format(L["COMPLETE_THE_TOTAL"] .. ": %s   ", GetColorText("FFFFFF", thisWeekCount)))
 end
 
 --#endregion
@@ -597,11 +612,16 @@ end
 ---地下堡完成时保存数据
 ---@param delveZone string 地下堡名称
 local function delveCompleteHandle(delveZone)
-    -- 地下堡层数, 如果中途掉线, 可能无法获取到该参数
-    local delveTier = C_CVar.GetCVar('lastSelectedDelvesTier')
+    local delveInfo = C_UIWidgetManager and C_UIWidgetManager.GetScenarioHeaderDelvesWidgetVisualizationInfo(6183)
+    local delveTier = "1"
+    local delveName = delveZone
 
-    if delveTier == nil or tonumber(delveTier) < 1 or tonumber(delveTier) > 11 then
-        delveTier = DRT_CONFIG_DB['LAST_SELECTED_DELVES_TIER']
+    if delveInfo and delveInfo.tierText then
+        delveTier = delveInfo.tierText
+    end
+
+    if delveInfo and delveInfo.headerText then
+        delveName = delveInfo.headerText
     end
 
     if delveTier == nil or tonumber(delveTier) < 1 or tonumber(delveTier) > 11 then
@@ -616,7 +636,7 @@ local function delveCompleteHandle(delveZone)
 
     -- 用户不存在, 新增用户信息及本次地下堡记录
     if index == 0 then
-        DRT_Log:debug(format('地下堡 [%s-%s] 已完成, 新增用户 %s-%s', delveZone, delveTier, unitName, realm))
+        DRT_Log:debug(format('地下堡 [%s-%s] 已完成, 新增用户 %s-%s', delveName, delveTier, unitName, realm))
         table.insert(
             DRT_DB,
             {
@@ -627,15 +647,15 @@ local function delveCompleteHandle(delveZone)
                 realm = realm,
                 classFilename = classFilename,
                 bountyMapStatus = checkBountyMap(),
-                record = { { zone = delveZone, tier = delveTier } },
+                record = { { zone = delveName, tier = delveTier } },
             }
         )
     else
-        DRT_Log:debug(format('%s-%s 已完成 [%s-%s]', unitName, realm, delveZone, delveTier))
+        DRT_Log:debug(format('%s-%s 已完成 [%s-%s]', unitName, realm, delveName, delveTier))
         -- 用户存在, 新增本次地下堡记录
         local player = DRT_DB[index]
         local record = player["record"]
-        table.insert(record, { zone = delveZone, tier = delveTier })
+        table.insert(record, { zone = delveName, tier = delveTier })
         player = {
             sort = player.sort or "50",
             show = player.show or "SHOW",
@@ -667,30 +687,30 @@ DRTFrame:SetScript("OnEvent", function(self, event, unit, ...)
         -- end
         -- print('上次地下堡1>' .. C_CVar.GetCVar('lastSelectedTieredEntranceTier'))
         -- print('上次地下堡2>' .. C_CVar.GetCVar('highestUnlockedTieredEntranceTier'))
-        
+
         addonInitHandle()
-        elseif event == "BAG_UPDATE_DELAYED" then
-            checkBountyMap()
-        elseif event == "SCENARIO_UPDATE" then
-            -- =========================================================== --
-            -- 当进入一个 Delve 时，加载 SCENARIO 更新事件来监听一个完成的 Delve  --
-            -- =========================================================== --
-            if C_PartyInfo.IsDelveInProgress() == true then
-                self:RegisterEvent("SCENARIO_CRITERIA_UPDATE")
-                -- print('DRT: 触发 SCENARIO_UPDATE')
-                DRT_CONFIG_DB['LAST_SELECTED_DELVES_TIER'] = C_CVar.GetCVar('lastSelectedDelvesTier')
-            end
-        elseif event == "SCENARIO_CRITERIA_UPDATE" then
-            local delveZone = GetZoneText()
-            -- =========================================================== --
-            -- 监听 delve 完成并持久化 --
-            -- =========================================================== --
-            -- print('DRT: 触发 SCENARIO_CRITERIA_UPDATE, 地下堡是否完成: ', C_PartyInfo.IsDelveComplete())
-            if C_PartyInfo.IsDelveComplete() == true and delveZone ~= "Zekvir's Lair" and delveZone ~= "Underpin's Demolition Competition" then
-                -- 需要注销事件, 防止重复调用
-                self:UnregisterEvent("SCENARIO_CRITERIA_UPDATE")
-                delveCompleteHandle(delveZone)
-            end
+    elseif event == "BAG_UPDATE_DELAYED" then
+        checkBountyMap()
+    elseif event == "SCENARIO_UPDATE" then
+        -- =========================================================== --
+        -- 当进入一个 Delve 时，加载 SCENARIO 更新事件来监听一个完成的 Delve  --
+        -- =========================================================== --
+        if C_PartyInfo.IsDelveInProgress() == true then
+            self:RegisterEvent("SCENARIO_CRITERIA_UPDATE")
+            -- print('DRT: 触发 SCENARIO_UPDATE')
+            -- DRT_CONFIG_DB['LAST_SELECTED_DELVES_TIER'] = C_CVar.GetCVar('lastSelectedDelvesTier')
+        end
+    elseif event == "SCENARIO_CRITERIA_UPDATE" then
+        local delveZone = GetZoneText()
+        -- =========================================================== --
+        -- 监听 delve 完成并持久化 --
+        -- =========================================================== --
+        -- print('DRT: 触发 SCENARIO_CRITERIA_UPDATE, 地下堡是否完成: ', C_PartyInfo.IsDelveComplete())
+        if C_PartyInfo.IsDelveComplete() == true and delveZone ~= "Zekvir's Lair" and delveZone ~= "Underpin's Demolition Competition" then
+            -- 需要注销事件, 防止重复调用
+            self:UnregisterEvent("SCENARIO_CRITERIA_UPDATE")
+            delveCompleteHandle(delveZone)
+        end
     end
 end)
 
