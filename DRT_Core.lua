@@ -362,8 +362,6 @@ local function checkPreyCount()
             break
         end
     end
-    -- print(value .. ' > ' .. tostring(done))
-    print('狩猎完成次数' .. completed)
 
     local unitGUID = UnitGUID("player")
     if unitGUID ~= nil then
@@ -442,14 +440,6 @@ local function DrawDelveSetting(container)
         GuiCreateSpacing(scroll, 20)
     end
 
-    GuiCreateEmptyLine(scroll, 2)
-    -- 最近一次选择的地下堡层数
-    GuiCreateChatLabel(scroll,
-        format('%s: %s', "11", "22"),
-        -- format('%s: %s', L["LAST_SELECTED_DELVES_TIER"], DRT_CONFIG_DB['LAST_SELECTED_DELVES_TIER']),
-        280,
-        "LEFT"
-    )
     GuiCreateEmptyLine(scroll, 5)
 
     --------------------------------------------------
@@ -712,16 +702,6 @@ end
 DRTFrame:SetScript("OnEvent", function(self, event, unit, ...)
     ------------EVENTS---------------
     if event == "ADDON_LOADED" and unit == "DelveRecordTracker" then
-        -- 上次选择的地下堡层数
-        -- if(C_CVar.GetCVar('lastSelectedDelvesTier') == nil) then
-        --     C_CVar.SetCVar('lastSelectedDelvesTier', 1)
-        -- end
-        -- if C_CVar.GetCVar('lastSelectedDelvesTier') > C_CVar.GetCVar('highestUnlockedDelvesTier') then
-        --     C_CVar.SetCVar('lastSelectedDelvesTier', 11)
-        -- end
-        -- print('上次地下堡1>' .. C_CVar.GetCVar('lastSelectedTieredEntranceTier'))
-        -- print('上次地下堡2>' .. C_CVar.GetCVar('highestUnlockedTieredEntranceTier'))
-
         addonInitHandle()
     elseif event == 'PLAYER_LOGIN' then
         self:UnregisterEvent("PLAYER_LOGIN")
