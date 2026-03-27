@@ -93,3 +93,38 @@ DRT_DELVE_TREASURE_MAP_ICON = {
     ["11.2"] = "Inv_enchanting_crystal",
     ["12.0"] = "Icon_treasuremap"
 }
+
+-- From saveInstances
+-- https://wago.tools/db2/QuestLabel?filter%5BLabelID%5D=6036&page=1
+PREY_QUESTID = {
+    91269, -- Prey: Dengzag, the Darkened Blaze (Nightmare)
+    91268, -- Prey: Grothoz, the Burning Shadow (Nightmare)
+    91267, -- Prey: Thorn-Witch Liset (Nightmare)
+    91266, -- Prey: Thornspeaker Edgath (Nightmare)
+    91265, -- Prey: Neydra the Starving (Nightmare)
+    91264, -- Prey: Lost Theldrin (Nightmare)
+    91263, -- Prey: Vylenna the Defector (Nightmare)
+    91262, -- Prey: Knight-Errant Bloodshatter (Nightmare)
+    91261, -- Prey: Imperator Enigmalia (Nightmare)
+    91260, -- Prey: Executor Kaenius (Nightmare)
+    91259, -- Prey: Consul Nebulor (Nightmare)
+    91258, -- Prey: Praetor Singularis (Nightmare)
+    91257, -- Prey: Crusader Luxia Maxwell (Nightmare)
+    91256, -- Prey: High Vindicator Vureem (Nightmare)
+    91241, -- Prey: Lamyne of the Undercroft (Nightmare)
+    91239, -- Prey: Petyoll the Razorleaf (Nightmare)
+    91237, -- Prey: Lieutenant Blazewing (Nightmare)
+    91235, -- Prey: Ranger Swiftglade (Nightmare)
+    91233, -- Prey: The Wing of Akil'zon (Nightmare)
+    91231, -- Prey: The Talon of Jan'alai (Nightmare)
+    91229, -- Prey: Zadu, Fist of Nalorakk (Nightmare)
+    91227, -- Prey: Jo'zolo the Breaker (Nightmare)
+    91225, -- Prey: Nexus-Edge Hadim (Nightmare)
+    91223, -- Prey: Phaseblade Talasha (Nightmare)
+    91221, -- Prey: Deliah Gloomsong (Nightmare)
+    91219, -- Prey: Mordril Shadowfell (Nightmare)
+    91217, -- Prey: L-N-0R the Recycler (Nightmare)
+    91215, -- Prey: Senior Tinker Ozwold (Nightmare)
+    91213, -- Prey: Magistrix Emberlash (Nightmare)
+    91211, -- Prey: Magister Sunbreaker (Nightmare)
+}

@@ -82,6 +82,7 @@ end
 -------------------------------------------------------------------------------------------------------------
 -- 地下堡记录
 -------------------------------------------------------------------------------------------------------------
+
 ---绘制地下堡记录
 local function DrawDelveRecord(container)
     DRT_Log:debug('绘制记录页面 => DrawDelveRecord')
@@ -138,8 +139,13 @@ local function DrawDelveRecord(container)
                 playerText = playerText .. bountyMapText
             end
 
-            -- 货币
-            local currencyText = ""
+            ---------- 第二行信息
+            -- 梦魇狩猎次数
+            local secondText = ""
+            if player.preyNightmare ~= nil then
+                secondText = secondText
+                    .. player.preyNightmare
+            end
             -- -- 钥匙
             -- local keyInfo = C_CurrencyInfo.GetCurrencyInfo(3028)
             -- currencyText = currencyText .. "|T4622270:14:14|t" .. keyInfo.quantity .. " "
@@ -174,7 +180,7 @@ local function DrawDelveRecord(container)
 
 
             local recordLabel = AceGUI:Create("Label")
-            recordLabel:SetText(playerText .. "\n" .. currencyText .. recordText)
+            recordLabel:SetText(playerText .. "\n" .. secondText .. '\n\n' .. recordText)
             recordLabel:SetFont(ChatFontNormal:GetFont())
             recordLabel:SetWidth(200)
             recordLabel:SetHeight(210);
@@ -340,6 +346,32 @@ local function addRecord(container)
     settingHead:SetFullWidth(true)
     scroll:AddChild(settingHead)
     scroll:AddChild(innerGroup)
+end
+
+--#endregion
+
+--#region 狩猎
+local function checkPreyCount()
+    local completed = 0
+    for _, value in pairs(PREY_QUESTID) do
+        local isCompleted = C_QuestLog.IsQuestFlaggedCompleted(value)
+        if (isCompleted) then
+            completed = completed + 1
+        end
+        if completed == 4 then
+            break
+        end
+    end
+    -- print(value .. ' > ' .. tostring(done))
+    print('狩猎完成次数' .. completed)
+
+    local unitGUID = UnitGUID("player")
+    if unitGUID ~= nil then
+        local index = checkPlayerDBIndex(unitGUID)
+        local player = DRT_DB[index]
+        player.preyNightmare = tostring(completed) .. "/4"
+        DRT_DB[index] = player
+    end
 end
 
 --#endregion
@@ -540,6 +572,7 @@ local function showUI()
         end)
         DRTMainFrame:SetWidth(DRT_CONFIG_DB.mainWidth)
         DRTMainFrame:SetHeight(580)
+        DRTMainFrame:SetPoint("CENTER", UIParent, "CENTER", -550, 0)
         DRTMainFrame:SetLayout("Fill")
 
         DRTTabFrame = AceGUI:Create("TabGroup")
@@ -580,6 +613,7 @@ DRTFrame:RegisterEvent("ADDON_LOADED")
 DRTFrame:RegisterEvent("BAG_UPDATE_DELAYED")
 DRTFrame:RegisterEvent("SCENARIO_UPDATE")          -- 场景战役状态发生变更时触发
 DRTFrame:RegisterEvent("SCENARIO_CRITERIA_UPDATE") -- 场景战役目标更新时触发, 例如拾取了物品, 击杀了怪物等
+DRTFrame:RegisterEvent("PLAYER_LOGIN")             -- 角色登录
 DRTFrame:SetSize(0, 0)
 DRTFrame:Hide()
 
@@ -689,6 +723,9 @@ DRTFrame:SetScript("OnEvent", function(self, event, unit, ...)
         -- print('上次地下堡2>' .. C_CVar.GetCVar('highestUnlockedTieredEntranceTier'))
 
         addonInitHandle()
+    elseif event == 'PLAYER_LOGIN' then
+        self:UnregisterEvent("PLAYER_LOGIN")
+        checkPreyCount()
     elseif event == "BAG_UPDATE_DELAYED" then
         checkBountyMap()
     elseif event == "SCENARIO_UPDATE" then
