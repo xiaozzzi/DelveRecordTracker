@@ -351,7 +351,8 @@ end
 --#endregion
 
 --#region 狩猎
-local function checkPreyCount()
+
+local function getPreyCount()
     local completed = 0
     for _, value in pairs(PREY_QUESTID) do
         local isCompleted = C_QuestLog.IsQuestFlaggedCompleted(value)
@@ -363,14 +364,19 @@ local function checkPreyCount()
         end
     end
 
+    return tostring(completed) .. "/4"
+end
+
+local function checkPreyCount()
     local unitGUID = UnitGUID("player")
     if unitGUID ~= nil then
         local index = checkPlayerDBIndex(unitGUID)
         local player = DRT_DB[index]
-        player.preyNightmare = tostring(completed) .. "/4"
+        player.preyNightmare = getPreyCount()
         DRT_DB[index] = player
     end
 end
+
 
 --#endregion
 
@@ -670,6 +676,7 @@ local function delveCompleteHandle(delveZone)
                 unitName = unitName,
                 realm = realm,
                 classFilename = classFilename,
+                preyNightmare = getPreyCount(),
                 bountyMapStatus = checkBountyMap(),
                 record = { { zone = delveName, tier = delveTier } },
             }
@@ -687,6 +694,7 @@ local function delveCompleteHandle(delveZone)
             unitName = unitName,
             realm = realm,
             classFilename = classFilename,
+            preyNightmare = getPreyCount(),
             bountyMapStatus = checkBountyMap(),
             record = record
         }

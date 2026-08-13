@@ -1,4 +1,4 @@
-## Interface: 120001, 120000
+## Interface: 120007, 120100
 ## Title: DelveRecordTracker
 ## Notes: Save the completion records of multiple players delve and display them uniformly.
 ## Notes-zhCN: 保存多个角色的地下堡完成记录, 并统一展示.
@@ -8,19 +8,6 @@
 ## IconTexTure: Interface\AddOns\DelveRecordTracker\assets\Logo
 ## DefaultState: enabled
 ## SavedVariables: DRT_DB,DRT_CONFIG_DB,DRT_ICON_DB
-## X-Category: Delve
-
-## Category-enUS: Delves
-## Category-deDE: Tiefen
-## Category-esES: Profundidades
-## Category-esMX: Abismos
-## Category-frFR: Gouffres
-## Category-itIT: Scorribande
-## Category-koKR: 구렁
-## Category-ptBR: Imersões
-## Category-ruRU: Вылазки
-## Category-zhCN: 地下堡
-## Category-zhTW: 探究
 
 # Libraries
 libs/Ace3/LibStub/LibStub.lua
