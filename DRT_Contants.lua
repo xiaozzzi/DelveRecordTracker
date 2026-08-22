@@ -1,5 +1,5 @@
 DRT_GLOBLE = {
-    VERSION = "v12.0.1",
+    VERSION = "v12.1.1",
 }
 
 -- DRT_DELVES_POI_IDS = {
@@ -72,6 +72,9 @@ DRT_DELVES_POI_IDS = {
     -- 虚影风暴
     [2506] = { ["zone"] = 2405 }, -- 影卫营 2506
     [2571] = { ["zone"] = 2405 }, -- 戮日盛殿 2571、2528
+    -- 盘卷蛇岛
+    [2633] = { ["zone"] = 2512 }, -- 荣耀之环 2633
+    [2635] = { ["zone"] = 2512 }, -- 纳拉多尔 2634
 
 }
 
@@ -80,7 +83,7 @@ DRT_DELVES_POI_IDS = {
 ---cmd: /dump C_Map.GetMapChildrenInfo(2255) 获取子地图名称
 ---cmd: /dump C_Map.GetBestMapForUnit("player") 获取当前用户所在地图名称
 DRT_DELVES_ID = {
-    2502, 2547, 2535, 2503, 2505, 2510, 2506, 2571
+    2502, 2547, 2535, 2503, 2505, 2510, 2506, 2571, 2633, 2635
 }
 
 --- dele
